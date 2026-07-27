@@ -17,6 +17,7 @@ pdf        = ["pypdf>=4", "pdfplumber>=0.11"]                 # trial-balance / 
 sharepoint = ["Office365-REST-Python-Client>=2.5"]
 com        = ["pywin32>=306", "xlwings>=0.31"]                # Windows-only Excel escape hatch
 otel       = ["opentelemetry-api>=1.27", "opentelemetry-sdk>=1.27"]  # optional off-box export
+docs       = ["python-docx>=1.1"]                             # operator Word (.docx) generation
 dev        = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]

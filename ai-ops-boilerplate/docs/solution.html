@@ -193,6 +193,14 @@
     <span class="vchip"><b>Market-ready</b> — from what works</span>
   </div>
 
+  <div class="vlabel">Operator enablement — documentation</div>
+  <div class="provenrail">
+    <span class="vchip"><b>README</b> run-guide</span>
+    <span class="vchip"><b>Operator Word</b> guide</span>
+    <span class="vchip"><b>Workflow diagram</b>  draw.io</span>
+    <span>· generated from one reconciled source — for discovery sign-off &amp; faster operator adoption</span>
+  </div>
+
   <div class="vlabel">Proven on — and beyond</div>
   <div class="provenrail">
     <span class="p">Procure-to-Pay</span>
@@ -254,6 +262,7 @@
     <tr><td><b>core.portals</b></td><td>Generic browser-login base: default-channel auto-launch, persistent Entra/Conditional-Access profile, tiered click-flow, session teardown. SSO <i>and</i> username/password.</td><td><span class="pill done">reviewed</span></td></tr>
     <tr><td><b>core.secretstore</b></td><td>Credential store abstraction with Windows (Credential Manager) <b>and</b> macOS (Keychain) backends + a platform-aware factory.</td><td><span class="pill done">reviewed</span></td></tr>
     <tr><td><b>core.engine</b></td><td>Opt-in orchestration: Automation → Stage → Step, retries, resume, human-in-the-loop, and a structured <span class="kbd">runs/</span> store. OpenTelemetry optional.</td><td><span class="pill done">verified · e2e test</span></td></tr>
+    <tr><td><b>core.docs</b></td><td>One reconciled <span class="kbd">PROCESS_STEPS.md</span> → the README run-guide, the operator Word (.docx) guide, and a draw.io workflow diagram — a single source so the three never drift. Stdlib parser + renderers (Word needs the <span class="kbd">docs</span> extra).</td><td><span class="pill done">verified · 12 tests</span></td></tr>
     <tr><td><b>recorder</b></td><td>Standalone Playwright recorder for capturing a portal flow during development — fully config-driven (portal-agnostic).</td><td><span class="pill done">reviewed</span></td></tr>
   </table>
 
@@ -290,7 +299,7 @@
 
   <p>A prior-art scan confirmed the individual pieces (Playwright, openpyxl, RPA templates) are commodity;
      the distinctive asset is <b>the team’s conventions + process &amp; domain knowledge, captured as skills an
-     AI assistant follows when generating each new automation</b>. Four ship in the harness:</p>
+     AI assistant follows when generating each new automation</b>. Six ship in the harness:</p>
 
   <table>
     <tr><th>Skill</th><th>Teaches</th></tr>
@@ -298,8 +307,15 @@
     <tr><td><b>excel-automation</b></td><td>The <span class="kbd">render()</span> discipline, Decimal money, header detection, and the escape-hatch policy.</td></tr>
     <tr><td><b>portal-login</b></td><td>SSO (persistent profile) and username/password login via the portal + secret-store APIs — never hardcode credentials.</td></tr>
     <tr><td><b>test-generation</b></td><td>Pure-function, golden-file regression (exact output — e.g. tie-out to the cent), safety-property, and engine end-to-end tests.</td></tr>
+    <tr><td><b>doc-generation</b></td><td>Reconcile the process against the shipped code into one <span class="kbd">PROCESS_STEPS.md</span>, then render the README run-guide and the operator-friendly Word (.docx) guide from it.</td></tr>
+    <tr><td><b>workflow-diagram-generation</b></td><td>Render a draw.io workflow diagram from the same source — ranked left→right layout, decisions that fan out cleanly, actor colours &amp; HITL flags — for the build team and operator sign-off.</td></tr>
   </table>
   <p class="sub" style="margin-top:-4px">Each skill was written against the shipped <span class="kbd">core/</span> code and symbol-checked, so it teaches the real API — not a plausible-looking but wrong one.</p>
+
+  <div class="call"><b>One source, three views.</b> The doc &amp; diagram skills render the README, the operator
+     Word guide, and the draw.io diagram from a single <span class="kbd">PROCESS_STEPS.md</span> that is first
+     reconciled against the actual code — so the operator’s guide, the sign-off diagram, and the shipped
+     tool cannot drift apart.</div>
 
   <div class="sec-head" style="margin-top:30px"><span class="n">05</span><div><h2>Authoring workflow</h2><div class="sub">From empty repo to shipped tool</div></div></div>
   <div class="flow" style="flex-wrap:wrap;gap:8px">
@@ -311,7 +327,9 @@
     <div class="arrow">→</div>
     <div class="node"><div class="k">4 · Test</div><div class="d">golden-file regression<br>(test skill)</div></div>
     <div class="arrow">→</div>
-    <div class="node ship"><div class="k">5 · Ship</div><div class="d">checklist · <span class="kbd">uv run</span></div></div>
+    <div class="node"><div class="k">5 · Document</div><div class="d">README · Word · diagram<br>(doc &amp; diagram skills)</div></div>
+    <div class="arrow">→</div>
+    <div class="node ship"><div class="k">6 · Ship</div><div class="d">checklist · <span class="kbd">uv run</span></div></div>
   </div>
   <p style="margin-top:16px">The full runbook lives in <span class="kbd">docs/AUTHORING.md</span>; house rules for the AI assistant
      live in <span class="kbd">CLAUDE.md</span>. A ship checklist gates delivery: tests green, README filled, no client
@@ -333,14 +351,15 @@
     <tr><td><b>Safe <span class="kbd">.gitignore</span> as a control</b></td><td>Confidential client data (inputs, outputs, audit logs) is kept out of version control by default.</td></tr>
   </table>
 
-  <div class="sec-head" style="margin-top:30px"><span class="n">07</span><div><h2>Delivery status</h2><div class="sub">On branch <span class="kbd">feature/ai-ops-boilerplate</span> · 8/8 tests green</span></div></div></div>
+  <div class="sec-head" style="margin-top:30px"><span class="n">07</span><div><h2>Delivery status</h2><div class="sub">On branch <span class="kbd">feature/ai-ops-boilerplate</span> · 20/20 tests green</span></div></div></div>
   <table>
     <tr><th>Workstream</th><th>Detail</th><th>State</th></tr>
     <tr><td>Skeleton &amp; conventions</td><td>Layout, dependency profile, safe ignore rules, house rules</td><td><span class="pill done">done</span></td></tr>
     <tr><td>Core modules</td><td>audit · excel · portals · secretstore · engine</td><td><span class="pill done">done</span></td></tr>
     <tr><td>Recorder</td><td>Standalone, config-driven Playwright capture</td><td><span class="pill done">done</span></td></tr>
-    <tr><td>Skills &amp; authoring guide</td><td>4 skills + AUTHORING.md, symbol-verified</td><td><span class="pill done">done</span></td></tr>
-    <tr><td>Automated tests</td><td>audit · excel · engine end-to-end (8 passing)</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Skills &amp; authoring guide</td><td>6 skills + AUTHORING.md, symbol-verified</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Operator docs &amp; workflow diagrams</td><td>README + operator Word guide + draw.io diagram, all from one <span class="kbd">PROCESS_STEPS.md</span></td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Automated tests</td><td>audit · excel · engine · docs (20 passing)</td><td><span class="pill done">done</span></td></tr>
     <tr><td>Worked example + golden-file regression</td><td>Real report implementation + exact-output regression test</td><td><span class="pill def">planned</span></td></tr>
     <tr><td>Template tooling (copier)</td><td>Fix-once-propagate-everywhere across instances</td><td><span class="pill def">deferred</span></td></tr>
   </table>
@@ -372,9 +391,10 @@
 │   ├── excel/      render() framework
 │   ├── portals/    SSO + login
 │   ├── secretstore/ Win + macOS
-│   └── engine/     opt-in orchestration
+│   ├── engine/     opt-in orchestration
+│   └── docs/       PROCESS_STEPS → docs + diagram
 ├── recorder/       Playwright capture
-├── .claude/skills/ 4 build-time skills
+├── .claude/skills/ 6 build-time skills
 ├── tests/          smoke + regression
 ├── docs/           AUTHORING, this doc
 ├── CLAUDE.md  README.md

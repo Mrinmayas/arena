@@ -46,5 +46,13 @@ uv run record <url>           # record a portal flow (needs: --extra browser)
 
 ## Skills
 Build using the skills in `.claude/skills/`: **observability**, **excel-automation**,
-**portal-login**, **test-generation** (+ readme). Read the relevant skill before writing
-that kind of code.
+**portal-login**, **test-generation**, **doc-generation** (README + operator Word from
+`PROCESS_STEPS.md`), **workflow-diagram-generation** (draw.io from the same source). Read
+the relevant skill before writing that kind of code.
+
+## Docs come from one source
+The README run-guide, the operator Word (.docx) guide, and the draw.io workflow diagram
+are all **rendered from `PROCESS_STEPS.md`** (schema: `core/docs/SCHEMA.md`) — never
+hand-authored independently. Reconcile the process narrative against the code into that
+file first, then render. Renderers: `core.docs.word.render_operator_guide` (needs
+`--extra docs`) and `core.docs.drawio.render_diagram` (stdlib).
