@@ -1,0 +1,33 @@
+[project]
+name = "ai-ops-automation"          # copier replaces with the real slug at spin-up
+version = "0.1.0"
+description = "An automation built from the AI-Ops boilerplate."
+requires-python = ">=3.12"          # pin to what IT ships; bump only deliberately
+dependencies = [
+    "pandas>=2.0",
+    "openpyxl>=3.1",
+    "numpy>=1.26",
+]
+
+# Capability layers mirror the opt-in architecture — install only what you need,
+# e.g.  uv sync --extra browser --extra pdf
+[project.optional-dependencies]
+browser    = ["playwright>=1.49", "keyring>=25", "ijson>=3.2"]  # portal automation + SSO secrets + recorder
+pdf        = ["pypdf>=4", "pdfplumber>=0.11"]                 # trial-balance / statement parsing
+sharepoint = ["Office365-REST-Python-Client>=2.5"]
+com        = ["pywin32>=306", "xlwings>=0.31"]                # Windows-only Excel escape hatch
+otel       = ["opentelemetry-api>=1.27", "opentelemetry-sdk>=1.27"]  # optional off-box export
+dev        = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+automate = "automation.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["automation", "core"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,33 @@
+# === Confidential client data — NEVER commit (this is a security control) ===
+# All operator inputs, tool outputs, and run artifacts live under these dirs.
+inputs/*
+!inputs/.gitkeep
+outputs/*
+!outputs/.gitkeep
+audit_logs/*
+!audit_logs/.gitkeep
+runs/*
+!runs/.gitkeep
+recordings/
+_data/
+
+# === Secrets ===
+# Real secrets go in the OS keychain via core.secretstore, never in git.
+.env
+.env.*
+!.env.example
+
+# === Browser profiles (SSO / session material) ===
+.recorder-profile*/
+.sso-profile*/
+browser_profiles/
+
+# === Python / uv ===
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/

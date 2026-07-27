@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Ops Automation Harness — Solution Document</title>
+<style>
+  :root{
+    --plane:#f2f1ee; --surface:#ffffff;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --hair:#e1e0d9; --border:rgba(11,11,11,.10);
+    --blue:#2a78d6; --blue-d:#184f95; --blue-dd:#0d366b; --blue-100:#cde2fb; --blue-150:#e8f1fd;
+    --aqua:#1baf7a; --orange:#eb6834; --violet:#4a3aa7;
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+    --good-ink:#006300;
+    --r:10px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--plane);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:var(--ink); line-height:1.62; font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:940px; margin:26px auto; background:var(--surface);
+    border:1px solid var(--border); border-radius:var(--r);
+    box-shadow:0 1px 2px rgba(11,11,11,.04),0 8px 30px rgba(11,11,11,.06);
+    padding:52px 60px 60px; position:relative; overflow:hidden;
+  }
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0 0 10px}
+  h1{font-size:38px;line-height:1.1;font-weight:760;letter-spacing:-.02em;margin:0 0 14px}
+  h2{font-size:22px;font-weight:730;letter-spacing:-.01em;margin:0 0 4px}
+  h3{font-size:15.5px;font-weight:700;margin:22px 0 8px}
+  p{margin:0 0 12px;color:var(--ink2)}
+  .lead{font-size:17px;color:var(--ink2);max-width:64ch}
+  a{color:var(--blue);text-decoration:none}
+  .muted{color:var(--muted)}
+  .sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--hair);padding-bottom:12px;margin-bottom:22px}
+  .sec-head .n{font-size:13px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+  .sub{color:var(--muted);font-size:13.5px;margin-top:2px}
+
+  /* ---------- cover ---------- */
+  .cover{background:linear-gradient(135deg,var(--blue-dd),var(--blue-d));color:#fff;
+    margin:-52px -60px 30px;padding:46px 60px 40px;}
+  .cover .eyebrow{color:#9ec5f4}
+  .cover h1{color:#fff}
+  .cover .lead{color:#dbe8fb}
+  .cover .meta{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:22px;font-size:12.5px;color:#bcd4f4}
+  .cover .meta b{color:#fff;font-weight:600}
+  .chip{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    color:#eaf2fd;border-radius:999px;padding:3px 11px;font-size:11.5px;font-weight:600;letter-spacing:.02em}
+
+  /* ---------- KPI tiles ---------- */
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}
+  .tile{border:1px solid var(--border);border-radius:8px;padding:16px 16px 14px;background:var(--surface)}
+  .tile .num{font-size:30px;font-weight:770;letter-spacing:-.02em;line-height:1}
+  .tile .num .u{font-size:15px;font-weight:600;color:var(--muted)}
+  .tile .lbl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+  .tile.accent{background:var(--blue-150);border-color:#cfe2f9}
+  .tile.accent .num{color:var(--blue-d)}
+
+  /* ---------- flow diagram ---------- */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:8px 0 6px}
+  .flow .node{flex:1 1 0;min-width:120px;border:1px solid var(--border);border-radius:8px;background:var(--surface);
+    padding:12px 12px;text-align:center;position:relative}
+  .flow .node .k{font-size:12px;font-weight:700}
+  .flow .node .d{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .flow .arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-weight:800;padding:0 6px;font-size:18px}
+  .flow .node.done{border-color:#bfe6cf;background:#eefaf1}
+  .flow .node.ship{border-color:#cfe2f9;background:var(--blue-150)}
+
+  /* ---------- before/after ---------- */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0}
+  .ba .col{border:1px solid var(--border);border-radius:8px;padding:16px 18px}
+  .ba .before{background:#fbf3f1;border-color:#f0d6cd}
+  .ba .after{background:#eefaf1;border-color:#bfe6cf}
+  .ba h4{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .ba .before h4{color:var(--crit)}
+  .ba .after h4{color:var(--good-ink)}
+  .ba ul{margin:0;padding-left:18px}
+  .ba li{color:var(--ink2);margin:6px 0;font-size:13.5px}
+
+  /* ---------- stack / layers ---------- */
+  .stack{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:6px 0}
+  .layer{padding:13px 18px;border-bottom:1px solid var(--hair);display:flex;gap:14px;align-items:flex-start}
+  .layer:last-child{border-bottom:0}
+  .layer .tag{flex:0 0 132px;font-weight:700;font-size:13px}
+  .layer .body{color:var(--ink2);font-size:13.5px}
+  .layer.l1{background:var(--blue-150)}
+  .layer.l2{background:#fff}
+  .layer.l3{background:#fbfaf7}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:#f4f3ef;border:1px solid var(--hair);border-radius:5px;padding:1px 6px;color:#33322f}
+
+  /* ---------- tables ---------- */
+  table{width:100%;border-collapse:collapse;margin:8px 0 14px;font-size:13.5px}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+    font-weight:700;padding:8px 10px;border-bottom:1.5px solid var(--hair)}
+  td{padding:9px 10px;border-bottom:1px solid var(--hair);color:var(--ink2);vertical-align:top}
+  td b,td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:0}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:#33322f}
+
+  /* ---------- pills ---------- */
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+    border-radius:999px;padding:2px 9px 2px 7px;letter-spacing:.01em;white-space:nowrap}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%}
+  .pill.done{background:#e7f7ea;color:var(--good-ink)} .pill.done::before{background:var(--good)}
+  .pill.def{background:#fff4de;color:#8a5a00} .pill.def::before{background:var(--warn)}
+  .pill.now{background:var(--blue-150);color:var(--blue-d)} .pill.now::before{background:var(--blue)}
+
+  /* ---------- callout ---------- */
+  .call{border-left:3px solid var(--blue);background:var(--blue-150);border-radius:0 8px 8px 0;
+    padding:14px 18px;margin:16px 0;font-size:13.5px;color:var(--ink2)}
+  .call b{color:var(--blue-d)}
+  .call.warnc{border-left-color:var(--serious);background:#fdf1ea}
+  .call.warnc b{color:#a24a1f}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .foot{position:absolute;bottom:20px;left:60px;right:60px;display:flex;justify-content:space-between;
+    font-size:11px;color:var(--muted);border-top:1px solid var(--hair);padding-top:8px}
+  pre.tree{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;
+    background:#fbfaf7;border:1px solid var(--hair);border-radius:8px;padding:14px 16px;color:#33322f;overflow:auto;margin:6px 0 14px}
+
+  @media (max-width:760px){
+    .page{padding:34px 22px 48px;margin:14px}
+    .cover{margin:-34px -22px 24px;padding:34px 22px 30px}
+    .tiles,.ba,.grid2{grid-template-columns:1fr}
+    .foot{position:static;margin-top:26px}
+  }
+  @media print{
+    body{background:#fff}
+    .page{box-shadow:none;border:0;border-radius:0;margin:0;max-width:none;
+      padding:26mm 20mm;page-break-after:always;min-height:auto}
+    .foot{position:fixed}
+    @page{size:A4;margin:0}
+  }
+  .vchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink2);border:1px solid var(--border);border-radius:999px;padding:5px 12px;background:#fbfaf7}
+  .vchip b{color:var(--ink)}
+  .provenrail{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+  .provenrail .p{font-weight:700;color:#fff;background:var(--blue);border-radius:999px;padding:3px 11px}
+  .vlabel{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin:26px 0 12px}
+  .chain{display:flex;align-items:stretch;flex-wrap:wrap}
+  .chain .step{flex:1 1 0;min-width:150px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 16px 15px;box-shadow:0 1px 2px rgba(11,11,11,.04)}
+  .chain .step .sn{width:25px;height:25px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .chain .step .st{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.25}
+  .chain .step .sd{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.42}
+  .chain .step.outcome{background:var(--blue-150);border-color:#cfe2f9}
+  .chain .step.outcome .sn{background:var(--blue-d)}
+  .chain .step.outcome .st{color:var(--blue-d)}
+  .chain .chev{display:flex;align-items:center;color:#c3c2b7;font-size:22px;padding:0 9px}
+</style>
+</head>
+<body>
+
+<!-- ============================ PAGE 1 — EXECUTIVE SUMMARY ============================ -->
+<section class="page">
+  <div class="cover">
+    <p class="eyebrow">Solution Document · Executive Summary</p>
+    <h1>AI-Ops Automation Harness</h1>
+    <p class="lead">An asset <b style="color:#fff">proven on client projects</b> — one that lets any team build and ship
+      Agentic AI workflows and agentic automations faster, accelerating FTE realisation across the operator network for your clients.</p>
+    <div class="meta">
+      <span><b>Prepared for</b> AI &amp; Automation teams</span>
+      <span><b>Asset</b> ai-ops-boilerplate</span>
+      <span class="chip">Reverse-engineered from ~20 delivered use cases</span>
+    </div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="num">~20</div><div class="lbl">Use cases delivered — a proven track record</div></div>
+    <div class="tile accent"><div class="num">~35%</div><div class="lbl">Build effort saved per use case</div></div>
+    <div class="tile"><div class="num" style="font-size:26px;letter-spacing:-.01em">Faster</div><div class="lbl">FTE realisation — the outcome it drives</div></div>
+  </div>
+
+  <div class="vlabel">How the value is created</div>
+  <div class="chain">
+    <div class="step"><div class="sn">1</div><div class="st">Adopt the proven asset</div><div class="sd">Copy the vetted, market-ready harness</div></div>
+    <div class="chev">›</div>
+    <div class="step"><div class="sn">2</div><div class="st">Build ~35% leaner</div><div class="sd">Skeleton, audit and conventions already in place</div></div>
+    <div class="chev">›</div>
+    <div class="step"><div class="sn">3</div><div class="st">Deploy to operations</div><div class="sd">The solution goes live in the operator’s environment</div></div>
+    <div class="chev">›</div>
+    <div class="step outcome"><div class="sn">4</div><div class="st">FTE realised</div><div class="sd">Sooner, and more reliably</div></div>
+  </div>
+
+  <div class="vlabel">What makes it an asset, not a concept</div>
+  <div class="provenrail">
+    <span class="vchip"><b>Proven skeleton</b> &amp; conventions</span>
+    <span class="vchip"><b>Audit</b> built-in — who did what</span>
+    <span class="vchip"><b>Prompting &amp; skills</b> intelligence</span>
+    <span class="vchip"><b>Market-ready</b> — from what works</span>
+  </div>
+
+  <div class="vlabel">Proven on — and beyond</div>
+  <div class="provenrail">
+    <span class="p">Procure-to-Pay</span>
+    <span class="p">Record-to-Report</span>
+    <span class="p">Order-to-Cash</span>
+    <span>· process-agnostic — extends to new operational domains (e.g. airline operations)</span>
+  </div>
+
+  <div class="foot"><span>AI-Ops Automation Harness — Solution Document</span><span>Executive Summary · Page 1</span></div>
+</section>
+
+<!-- ============================ PAGE 2 — ARCHITECTURE ============================ -->
+<section class="page">
+  <div class="sec-head"><span class="n">01</span><div><h2>Architecture — a layered baseline</h2><div class="sub">One legible spine; heavier capabilities are opt-in, never forced</div></div></div>
+
+  <p>The reference automations span a wide complexity range — from a self-contained Excel compiler
+     to a multi-step portal workflow with human-in-the-loop. A single rigid template can’t
+     serve both. The harness is therefore <b>layered</b>: a small always-present spine, plus capability
+     layers a developer switches on only when the use case needs them.</p>
+
+  <div class="stack">
+    <div class="layer l1"><div class="tag">Your automation</div><div class="body">
+      <span class="kbd">automation/</span> — the one entry point <span class="kbd">run(inputs, outputs)</span> (via <span class="kbd">uv run automate</span>),
+      plus your <span class="kbd">_transform.py</span> (read/classify inputs) and <span class="kbd">_report.py</span> (render output). Explicitly wired — no auto-discovery “magic”.</div></div>
+    <div class="layer l2"><div class="tag">Opt-in capabilities</div><div class="body">
+      <b>Browser + Recorder</b> (portal automation), <b>Excel framework</b>, <b>Engine</b> (multi-step Stage/Step orchestration with resume &amp; human-in-the-loop). Pulled in only when needed — a simple compiler ships none of them.</div></div>
+    <div class="layer l3"><div class="tag">Vendored core</div><div class="body">
+      <span class="kbd">core/</span> — <b>audit, excel, portals, secretstore, engine</b> — the reusable, generic, brand-free machinery distilled from the team’s trusted production tools. Copied into each repo (kept pristine; updated centrally, not hand-edited).</div></div>
+  </div>
+
+  <div class="call"><b>Design principle — legible over clever.</b> The harness deliberately drops the
+    source monorepo’s auto-discovery registry in favour of one explicit wiring call. A copy-me starter
+    should be something the next developer can read top-to-bottom, not reverse-engineer.</div>
+
+  <h3>Two shapes, one spine</h3>
+  <table>
+    <tr><th>Shape</th><th>When</th><th>What it uses</th></tr>
+    <tr><td><b>Simple</b> (default)</td><td>Excel compilers, single-pass tools, portal download-and-process</td><td>The <span class="kbd">run()</span> spine + Excel and/or Browser capability. No engine.</td></tr>
+    <tr><td><b>Orchestrated</b> (opt-in)</td><td>Multi-step workflows needing resume &amp; review gates</td><td>The <span class="kbd">core.engine</span> Stage/Step layer on the same spine, adding the structured run store.</td></tr>
+  </table>
+
+  <h3>Distribution &amp; scale</h3>
+  <p>Each automation is its <b>own self-contained repo</b> (or a small folder within one), copied from
+     this baseline and shipped to operator machines via <span class="kbd">uv</span>. This keeps client
+     environments isolated and every deliverable independently runnable — matching how the team already
+     works across ~7–10 developers and many client repos.</p>
+
+  <div class="foot"><span>AI-Ops Automation Harness</span><span>Architecture · Page 2</span></div>
+</section>
+
+<!-- ============================ PAGE 3 — CORE + OBSERVABILITY ============================ -->
+<section class="page">
+  <div class="sec-head"><span class="n">02</span><div><h2>Core capabilities</h2><div class="sub">Vendored, generic, and verified against the shipped code</div></div></div>
+
+  <table>
+    <tr><th>Module</th><th>What it provides</th><th>Status</th></tr>
+    <tr><td><b>core.audit</b></td><td>Always-on local observability — every event attributed <b>automation</b> vs <b>human</b>; run summary + sign-off trail; optional redaction. Stdlib-only.</td><td><span class="pill done">verified · 4 tests</span></td></tr>
+    <tr><td><b>core.excel</b></td><td>The <span class="kbd">render()</span> framework (pandas model → one atomic write), Decimal money, formula seam, plus preamble-resilient header detection &amp; workbook-repair utilities.</td><td><span class="pill done">verified · 3 tests</span></td></tr>
+    <tr><td><b>core.portals</b></td><td>Generic browser-login base: default-channel auto-launch, persistent Entra/Conditional-Access profile, tiered click-flow, session teardown. SSO <i>and</i> username/password.</td><td><span class="pill done">reviewed</span></td></tr>
+    <tr><td><b>core.secretstore</b></td><td>Credential store abstraction with Windows (Credential Manager) <b>and</b> macOS (Keychain) backends + a platform-aware factory.</td><td><span class="pill done">reviewed</span></td></tr>
+    <tr><td><b>core.engine</b></td><td>Opt-in orchestration: Automation → Stage → Step, retries, resume, human-in-the-loop, and a structured <span class="kbd">runs/</span> store. OpenTelemetry optional.</td><td><span class="pill done">verified · e2e test</span></td></tr>
+    <tr><td><b>recorder</b></td><td>Standalone Playwright recorder for capturing a portal flow during development — fully config-driven (portal-agnostic).</td><td><span class="pill done">reviewed</span></td></tr>
+  </table>
+
+  <div class="sec-head" style="margin-top:30px"><span class="n">03</span><div><h2>Observability — who did what</h2><div class="sub">The compliance backbone, uniform across every automation</div></div></div>
+
+  <p>For controls-sensitive processes the human-vs-automation split is not just logging — it is the
+     <b>reviewer sign-off artefact</b> (a four-eyes control). A reviewer approving a run must see exactly
+     which outputs the tool produced and which a person entered or approved. Every run therefore writes:</p>
+
+  <table>
+    <tr><th>Artefact</th><th>Contents</th></tr>
+    <tr><td class="mono">audit_logs/&lt;ts&gt;/audit.log</td><td>Human-readable, one line per event.</td></tr>
+    <tr><td class="mono">…/events.jsonl</td><td>Structured stream; <b>every event stamped <span class="kbd">actor: automation | human</span></b>.</td></tr>
+    <tr><td class="mono">…/run_summary.json</td><td>The sign-off split — automation actions vs. human actions/approvals, counts, and status.</td></tr>
+  </table>
+
+  <div class="call"><b>Uniform by design.</b> Whether an automation uses the engine or not, the same
+     <span class="kbd">audit_logs/</span> trail is produced — the engine bridges its events into the same
+     audit stream. Observability is mandatory and identical everywhere; there is no “un-audited” path.</div>
+
+  <h3>Excel policy — one safe lane, a narrow escape hatch</h3>
+  <p><span class="kbd">render()</span> is mandatory for all workbook <i>generation</i> (it prevented a whole
+     class of corrupt-file / stale-formula / cent-drift bugs in production). Raw <span class="kbd">openpyxl</span>
+     or live Excel via COM is allowed <b>only</b> for the declared cases it structurally can’t express —
+     in-place edits, live recalculation, <span class="kbd">.xlsm</span> macros, huge templates — and money is
+     Decimal even there. COM paths are flagged Windows-only.</p>
+
+  <div class="foot"><span>AI-Ops Automation Harness</span><span>Core &amp; Observability · Page 3</span></div>
+</section>
+
+<!-- ============================ PAGE 4 — SKILLS + AUTHORING ============================ -->
+<section class="page">
+  <div class="sec-head"><span class="n">04</span><div><h2>Build-time AI skills</h2><div class="sub">Where the differentiated value lives — house-style captured as reusable instructions</div></div></div>
+
+  <p>A prior-art scan confirmed the individual pieces (Playwright, openpyxl, RPA templates) are commodity;
+     the distinctive asset is <b>the team’s conventions + process &amp; domain knowledge, captured as skills an
+     AI assistant follows when generating each new automation</b>. Four ship in the harness:</p>
+
+  <table>
+    <tr><th>Skill</th><th>Teaches</th></tr>
+    <tr><td><b>observability</b></td><td>Attribute every action automation vs human; the audit APIs, redaction, and the sign-off trail.</td></tr>
+    <tr><td><b>excel-automation</b></td><td>The <span class="kbd">render()</span> discipline, Decimal money, header detection, and the escape-hatch policy.</td></tr>
+    <tr><td><b>portal-login</b></td><td>SSO (persistent profile) and username/password login via the portal + secret-store APIs — never hardcode credentials.</td></tr>
+    <tr><td><b>test-generation</b></td><td>Pure-function, golden-file regression (exact output — e.g. tie-out to the cent), safety-property, and engine end-to-end tests.</td></tr>
+  </table>
+  <p class="sub" style="margin-top:-4px">Each skill was written against the shipped <span class="kbd">core/</span> code and symbol-checked, so it teaches the real API — not a plausible-looking but wrong one.</p>
+
+  <div class="sec-head" style="margin-top:30px"><span class="n">05</span><div><h2>Authoring workflow</h2><div class="sub">From empty repo to shipped tool</div></div></div>
+  <div class="flow" style="flex-wrap:wrap;gap:8px">
+    <div class="node"><div class="k">1 · Spin up</div><div class="d">Copy · pick capabilities · <span class="kbd">uv sync</span></div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="k">2 · Logic</div><div class="d">transform + report<br>(excel skill)</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="k">3 · Audit</div><div class="d">attribute steps<br>(observability skill)</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="k">4 · Test</div><div class="d">golden-file regression<br>(test skill)</div></div>
+    <div class="arrow">→</div>
+    <div class="node ship"><div class="k">5 · Ship</div><div class="d">checklist · <span class="kbd">uv run</span></div></div>
+  </div>
+  <p style="margin-top:16px">The full runbook lives in <span class="kbd">docs/AUTHORING.md</span>; house rules for the AI assistant
+     live in <span class="kbd">CLAUDE.md</span>. A ship checklist gates delivery: tests green, README filled, no client
+     data committed, runs clean on a fresh machine, code on a branch.</p>
+
+  <div class="foot"><span>AI-Ops Automation Harness</span><span>Skills &amp; Authoring · Page 4</span></div>
+</section>
+
+<!-- ============================ PAGE 5 — DECISIONS + STATUS ============================ -->
+<section class="page">
+  <div class="sec-head"><span class="n">06</span><div><h2>Key decisions &amp; rationale</h2><div class="sub">The choices that shaped the baseline</div></div></div>
+  <table>
+    <tr><th style="width:30%">Decision</th><th>Rationale</th></tr>
+    <tr><td><b>Per-repo template, vendored core</b></td><td>Self-contained, client-isolated, laptop-runnable deliverables — matching how the team ships. (Central updates handled later via a template-update tool.)</td></tr>
+    <tr><td><b>No discovery / explicit wiring</b></td><td>A copy-me starter must be legible; the harness begins where the project’s discovery phase ends.</td></tr>
+    <tr><td><b>One spine, engine opt-in</b></td><td>Serves both a simple compiler and a complex multi-step workflow without two divergent frameworks to maintain.</td></tr>
+    <tr><td><b>Observability mandatory &amp; uniform</b></td><td>The human-vs-automation trail is a compliance requirement, not a nice-to-have — so it is never optional.</td></tr>
+    <tr><td><b>Excel: <span class="kbd">render()</span> default + narrow escape hatch</b></td><td>Honours the hard-won “no hand-rolled openpyxl” rule while still supporting COM / macros / in-place edits where genuinely required.</td></tr>
+    <tr><td><b>Safe <span class="kbd">.gitignore</span> as a control</b></td><td>Confidential client data (inputs, outputs, audit logs) is kept out of version control by default.</td></tr>
+  </table>
+
+  <div class="sec-head" style="margin-top:30px"><span class="n">07</span><div><h2>Delivery status</h2><div class="sub">On branch <span class="kbd">feature/ai-ops-boilerplate</span> · 8/8 tests green</span></div></div></div>
+  <table>
+    <tr><th>Workstream</th><th>Detail</th><th>State</th></tr>
+    <tr><td>Skeleton &amp; conventions</td><td>Layout, dependency profile, safe ignore rules, house rules</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Core modules</td><td>audit · excel · portals · secretstore · engine</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Recorder</td><td>Standalone, config-driven Playwright capture</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Skills &amp; authoring guide</td><td>4 skills + AUTHORING.md, symbol-verified</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Automated tests</td><td>audit · excel · engine end-to-end (8 passing)</td><td><span class="pill done">done</span></td></tr>
+    <tr><td>Worked example + golden-file regression</td><td>Real report implementation + exact-output regression test</td><td><span class="pill def">planned</span></td></tr>
+    <tr><td>Template tooling (copier)</td><td>Fix-once-propagate-everywhere across instances</td><td><span class="pill def">deferred</span></td></tr>
+  </table>
+
+  <div class="foot"><span>AI-Ops Automation Harness</span><span>Decisions &amp; Status · Page 5</span></div>
+</section>
+
+<!-- ============================ PAGE 6 — ROADMAP + APPENDIX ============================ -->
+<section class="page">
+  <div class="sec-head"><span class="n">08</span><div><h2>Roadmap &amp; appendix</h2><div class="sub">What’s next, and how the repo is laid out</div></div></div>
+
+  <div class="grid2">
+    <div>
+      <h3>Next — Worked example <span class="pill def">planned</span></h3>
+      <p>Replace the placeholder report step with a real <span class="kbd">core.excel.render()</span> implementation
+         and add a golden-file regression test, proving <span class="kbd">uv run automate</span> end-to-end on a laptop and
+         giving authors a concrete example to copy.</p>
+      <h3>Later — Template tooling <span class="pill def">deferred</span></h3>
+      <p>Adopt <b>copier</b> when several instances exist: its <span class="kbd">update</span> can push a core or skill
+         fix into <i>already-created</i> repos — the fix for the “drifting copies” problem, at the scale where it
+         starts to pay off. Today, a plain copy is sufficient.</p>
+    </div>
+    <div>
+      <h3>Repository layout</h3>
+      <pre class="tree">ai-ops-boilerplate/
+├── automation/     your logic (run() spine)
+├── core/           vendored, generic
+│   ├── audit/      observability
+│   ├── excel/      render() framework
+│   ├── portals/    SSO + login
+│   ├── secretstore/ Win + macOS
+│   └── engine/     opt-in orchestration
+├── recorder/       Playwright capture
+├── .claude/skills/ 4 build-time skills
+├── tests/          smoke + regression
+├── docs/           AUTHORING, this doc
+├── CLAUDE.md  README.md
+└── pyproject.toml  uv.lock</pre>
+    </div>
+  </div>
+
+  <div class="call warnc"><b>Positioning (consultant’s note).</b> The plumbing here is intentionally
+     commodity; the durable advantage is the <b>conventions and domain skills</b> the harness
+     encodes. Invest maintenance there — the skills and the vetted <span class="kbd">core/</span> — rather than
+     in bespoke infrastructure.</div>
+
+  <p class="sub" style="margin-top:20px;border-top:1px solid var(--hair);padding-top:14px">
+     <b style="color:var(--ink2)">Author:</b> Mrin Shrivastava &nbsp;·&nbsp; SWAT team.
+     Prepared as a living solution document for the AI-Ops Automation Harness; figures reflect the
+     current state of the <span class="kbd">feature/ai-ops-boilerplate</span> branch.</p>
+
+  <div class="foot"><span>AI-Ops Automation Harness — Solution Document</span><span>Roadmap &amp; Appendix · Page 6</span></div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+# AI-Ops boilerplate — spin-up questionnaire.
+#   copier copy <boilerplate-repo> <new-automation-dir>
+#
+# These questions drive the package name + which capability extras and layers are
+# wired into the generated repo. (Full Jinja templating of the tree is applied in a
+# later boilerplate phase; this file declares the spin-up interface.)
+
+project_slug:
+  type: str
+  help: "Automation package name in snake_case, e.g. ar_aging_compiler"
+
+client:
+  type: str
+  help: "Client this automation is for (e.g. wsa, loreal, starhub)"
+
+one_line:
+  type: str
+  help: "One-line description of what the tool does"
+
+needs_browser:
+  type: bool
+  default: false
+  help: "Does it log into a web portal (Playwright + SSO)?"
+
+needs_pdf:
+  type: bool
+  default: false
+  help: "Does it parse PDFs (trial balances, statements)?"
+
+needs_sharepoint:
+  type: bool
+  default: false
+  help: "Does it read/write SharePoint?"
+
+needs_engine:
+  type: bool
+  default: false
+  help: "Multi-step with resume / human-in-the-loop? (turns on the orchestration engine)"
+
+excel_escape_hatch:
+  type: bool
+  default: false
+  help: "Needs in-place Excel edits, live recalc, .xlsm macros, or huge templates? (Windows-only COM)"
