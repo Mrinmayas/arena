@@ -287,13 +287,14 @@
       <a href="#observability"><span class="num">3</span> Observability</a>
       <a href="#excel"><span class="num">4</span> Excel policy</a>
       <a href="#engine"><span class="num">5</span> Engine &amp; orchestration</a>
-      <a href="#docs"><span class="num">6</span> Docs pipeline</a>
-      <a href="#skills"><span class="num">7</span> Build-time AI skills</a>
-      <a href="#authoring"><span class="num">8</span> Authoring a new automation</a>
-      <a href="#testing"><span class="num">9</span> Testing</a>
-      <a href="#decisions"><span class="num">10</span> Key decisions</a>
-      <a href="#status"><span class="num">11</span> Delivery status</a>
-      <a href="#roadmap"><span class="num">12</span> Roadmap &amp; appendix</a>
+      <a href="#portals"><span class="num">6</span> Portal, secrets &amp; recorder</a>
+      <a href="#docs"><span class="num">7</span> Docs pipeline</a>
+      <a href="#skills"><span class="num">8</span> Build-time AI skills</a>
+      <a href="#authoring"><span class="num">9</span> Authoring a new automation</a>
+      <a href="#testing"><span class="num">10</span> Testing</a>
+      <a href="#decisions"><span class="num">11</span> Key decisions</a>
+      <a href="#status"><span class="num">12</span> Delivery status</a>
+      <a href="#roadmap"><span class="num">13</span> Roadmap &amp; appendix</a>
     </nav>
     <div class="foot">
       <b>Accenture</b> · SWAT team<br>Author: Mrin Shrivastava
@@ -586,9 +587,49 @@ audit.human("j.doe", "approved the tie-out variance", amount="12.50")</code></pr
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Engine &amp; orchestration</span></div>
       </section>
 
-      <!-- ===================== 6 · DOCS PIPELINE ===================== -->
-      <section class="doc" id="docs">
+      <!-- ===================== 6 · PORTAL AUTOMATION ===================== -->
+      <section class="doc" id="portals">
         <div class="sec-head"><span class="n">6</span>
+          <div><h2>Portal automation, secrets &amp; the recorder</h2><div class="sub">The riskiest capability — SSO that works unattended, credentials that never touch source</div></div></div>
+
+        <p>Browser automation is the hardest part of most back-office tools to get right, so the harness carries the
+          hard-won patterns in <span class="kbd">core.portals</span> — a generic, engine-decoupled login base for both
+          <b>SSO</b> and <b>username/password</b> portals.</p>
+
+        <div class="call"><b>The Conditional-Access lesson.</b> Most portals sit behind Entra SSO with Conditional
+          Access, which admits only a <i>compliant device</i>. So the browser launches against a <b>persistent on-disk
+          profile</b> (<span class="kbd">user_data_dir</span>) that presents the device's real compliance state — a
+          throwaway guest profile is rejected and blocked. On close, the teardown <b>clears the web session
+          (cookies + <span class="kbd">localStorage</span>/<span class="kbd">sessionStorage</span>) but keeps the
+          profile</b>: <i>disposable session, durable device identity</i>. A naive "clear everything on teardown" would
+          silently re-trigger the compliance block.</p>
+
+        <table>
+          <thead><tr><th>Mechanism</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><b>Persistent profile</b></td><td>Default browser channel + <span class="kbd">user_data_dir</span> → Conditional-Access-compliant; log in once, reuse the session across runs.</td></tr>
+            <tr><td><b>Tiered click-retry</b></td><td>Quick attempt → timed retries → networkidle fallback → manual pause. Resilient to slow / flaky portals without hanging.</td></tr>
+            <tr><td><b>Session teardown</b></td><td>On close, clear cookies + web storage (the <span class="kbd">finally</span> equivalent) but keep the profile. Best-effort — never masks the run outcome.</td></tr>
+            <tr><td><b>Secrets</b></td><td><span class="kbd">core.secretstore</span> — Windows Credential Manager <b>+</b> macOS Keychain via a platform-aware factory. Credentials never live in source or a committed <span class="kbd">.env</span>.</td></tr>
+          </tbody>
+        </table>
+
+        <h3>The recorder</h3>
+        <p>A standalone, config-driven, <b>dev-time</b> tool that captures a portal flow — selectors and screenshots —
+          as the starting point for the automation. Portal-agnostic; never shipped to operators.</p>
+        <pre><code>uv sync --extra browser          # playwright + keyring + the recorder
+uv run python -m recorder &lt;url&gt;   # record a flow to build from</code></pre>
+
+        <p class="muted" style="font-size:12.5px">Cross-platform note: the pure-Python default lane (Excel + portals)
+          runs on Windows and macOS alike; only the Excel COM escape hatch (<span class="kbd">xlwings</span>) is
+          Windows-only, and it is flagged per-automation.</p>
+
+        <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Portal automation</span></div>
+      </section>
+
+      <!-- ===================== 7 · DOCS PIPELINE ===================== -->
+      <section class="doc" id="docs">
+        <div class="sec-head"><span class="n">7</span>
           <div><h2>Docs pipeline — one source, three views</h2><div class="sub">The README, the operator Word guide, and the diagram can never drift apart</div></div></div>
 
         <p>The README run-guide, the operator Word (.docx) guide, and the draw.io workflow diagram are all
@@ -613,9 +654,9 @@ audit.human("j.doe", "approved the tie-out variance", amount="12.50")</code></pr
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Docs pipeline</span></div>
       </section>
 
-      <!-- ===================== 7 · SKILLS ===================== -->
+      <!-- ===================== 8 · SKILLS ===================== -->
       <section class="doc" id="skills">
-        <div class="sec-head"><span class="n">7</span>
+        <div class="sec-head"><span class="n">8</span>
           <div><h2>Build-time AI skills</h2><div class="sub">Where the differentiated value lives — house-style captured as reusable instructions</div></div></div>
 
         <p>A prior-art scan confirmed the individual pieces (Playwright, openpyxl, RPA templates) are commodity; the
@@ -644,11 +685,12 @@ audit.human("j.doe", "approved the tie-out variance", amount="12.50")</code></pr
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Build-time AI skills</span></div>
       </section>
 
-      <!-- ===================== 8 · AUTHORING ===================== -->
+      <!-- ===================== 9 · AUTHORING ===================== -->
       <section class="doc" id="authoring">
-        <div class="sec-head"><span class="n">8</span>
+        <div class="sec-head"><span class="n">9</span>
           <div><h2>Authoring a new automation</h2><div class="sub">From empty repo to shipped tool</div></div></div>
 
+        <p style="margin:0 0 12px"><b>Step 0 (once).</b> Promote the run-guide to be the repo's README — <span class="kbd">rm README.md &amp;&amp; mv README.automation.md README.md</span> — then fill it in. Then:</p>
         <div class="flow" style="margin-bottom:8px">
           <div class="node"><div class="k">1 · Spin up</div><div class="d">Copy · pick capabilities · <span class="kbd">uv sync</span></div></div>
           <div class="arrow">→</div>
@@ -708,9 +750,9 @@ uv run python -m recorder &lt;url&gt;   # record a portal flow (needs: --extra b
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Authoring</span></div>
       </section>
 
-      <!-- ===================== 9 · TESTING ===================== -->
+      <!-- ===================== 10 · TESTING ===================== -->
       <section class="doc" id="testing">
-        <div class="sec-head"><span class="n">9</span>
+        <div class="sec-head"><span class="n">10</span>
           <div><h2>Testing</h2><div class="sub">Mandatory — a cents-level drift must fail the build</div></div></div>
 
         <p>Tests live in <span class="kbd">tests/</span> and are not optional. Every automation ships at least a smoke
@@ -731,9 +773,9 @@ uv run python -m recorder &lt;url&gt;   # record a portal flow (needs: --extra b
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Testing</span></div>
       </section>
 
-      <!-- ===================== 10 · DECISIONS ===================== -->
+      <!-- ===================== 11 · DECISIONS ===================== -->
       <section class="doc" id="decisions">
-        <div class="sec-head"><span class="n">10</span>
+        <div class="sec-head"><span class="n">11</span>
           <div><h2>Key decisions &amp; rationale</h2><div class="sub">The choices that shaped the baseline</div></div></div>
         <table>
           <thead><tr><th style="width:30%">Decision</th><th>Rationale</th></tr></thead>
@@ -749,9 +791,9 @@ uv run python -m recorder &lt;url&gt;   # record a portal flow (needs: --extra b
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Key decisions</span></div>
       </section>
 
-      <!-- ===================== 11 · STATUS ===================== -->
+      <!-- ===================== 12 · STATUS ===================== -->
       <section class="doc" id="status">
-        <div class="sec-head"><span class="n">11</span>
+        <div class="sec-head"><span class="n">12</span>
           <div><h2>Delivery status</h2><div class="sub">On branch <span class="kbd">feature/ai-ops-boilerplate</span> · 20/20 tests green</div></div></div>
         <table>
           <thead><tr><th>Workstream</th><th>Detail</th><th>State</th></tr></thead>
@@ -769,9 +811,9 @@ uv run python -m recorder &lt;url&gt;   # record a portal flow (needs: --extra b
         <div class="pagefoot"><span>AI-Ops Automation Harness <span class="gt">&gt;</span></span><span>Delivery status</span></div>
       </section>
 
-      <!-- ===================== 12 · ROADMAP + APPENDIX ===================== -->
+      <!-- ===================== 13 · ROADMAP + APPENDIX ===================== -->
       <section class="doc" id="roadmap">
-        <div class="sec-head"><span class="n">12</span>
+        <div class="sec-head"><span class="n">13</span>
           <div><h2>Roadmap &amp; appendix</h2><div class="sub">What's next, and how the repo is laid out</div></div></div>
 
         <h3>Roadmap</h3>
