@@ -211,6 +211,42 @@ Each of these is stated as **context → decision → why → consequence**.
 - **Why.** Developers work on Macs; operators may be on Windows. The default lane must
   work on both, with the platform-specific escape hatch clearly marked.
 
+### 4.8 Distribution — a GitHub template + two READMEs
+
+- **Context.** The asset has to be adopted by other teams with minimal friction, and each
+  adoption must start a clean, self-contained automation repo.
+- **Decision.** Ship the harness as a **published GitHub template repo**
+  (`314495_ai-ops-harness-swat`, "Use this template" enabled). Because GitHub copies
+  `README.md` verbatim into every generated repo, split the READMEs by audience: the
+  landing `README.md` is the **harness page** (for a developer evaluating the template);
+  the clean operator/build run-guide ships as `README.automation.md` and is **promoted to
+  `README.md` at spin-up** — Step 0 in `CLAUDE.md`: `rm README.md && mv README.automation.md README.md`.
+- **Why.** One README can't serve both the "evaluate the template on GitHub" moment and
+  the "run the shipped automation" moment — it is the landing page for both. Splitting by
+  lifecycle moment, bridged by a one-line promote, gives each its right first impression.
+- **Consequence.** The promote is manual until `copier` lands (copier can do the rename on
+  generation — §5, §9). The dev boilerplate and a public `Mrinmayas/arena` mirror are kept
+  byte-for-byte in sync with the template.
+
+### 4.9 Portal login — a persistent profile with session teardown
+
+- **Context.** Most portals sit behind Entra SSO with Conditional Access, which requires a
+  *compliant device*; a throwaway browser profile is rejected as non-compliant and blocked.
+- **Decision.** `core.portals` launches the default browser channel against a **persistent
+  on-disk profile (`user_data_dir`)**, so the device's real compliance state is presented —
+  log in once, reuse the session across runs. On close, a **teardown clears the web session
+  (cookies + `localStorage`/`sessionStorage`) but keeps the profile** (best-effort, never
+  raises); the low-level launcher also closes context + browser in a `finally`. Credentials
+  for username/password portals come from `core.secretstore` (OS keychain), never source.
+- **Why.** The persistent profile is what makes Conditional-Access SSO work unattended;
+  clearing the web session each run gives a clean login *without* discarding the device
+  identity Conditional Access depends on. Keeping the two separate — **disposable session,
+  durable device profile** — is the non-obvious lesson a naive "clear everything on
+  teardown" would break (it would silently re-trigger a compliance block).
+- **Consequence.** `core.portals` is engine-decoupled, so a simple download-and-process
+  tool logs in without pulling in the engine; the recorder captures a flow (selectors +
+  screenshots) during development.
+
 ---
 
 ## 5. Decisions we reversed — and why
@@ -241,9 +277,10 @@ Honest record of the thinking, because the reversals *are* the design process.
 
 ## 6. What got built
 
-On branch `feature/ai-ops-boilerplate` of the `314495_wsa-automation` repo (a git
-worktree; `main` untouched), mirrored to the personal `Mrinmayas/arena` repo. **20/20
-tests green.**
+Built on branch `feature/ai-ops-boilerplate` of the `314495_wsa-automation` repo (a git
+worktree; `main` untouched) and **published as the GitHub template repo
+`314495_ai-ops-harness-swat`** ("Use this template" enabled); a public `Mrinmayas/arena`
+copy mirrors it. All three are kept byte-for-byte in sync. **20/20 tests green.**
 
 **Vendored, generic `core/`** — brand-free, distilled from the trusted production tools:
 
@@ -263,8 +300,10 @@ written against the shipped `core/` and symbol-checked so it teaches the real AP
 `workflow-diagram-generation`.
 
 Plus `docs/AUTHORING.md` (the runbook), a skeletal `CLAUDE.md` (house rules for the AI
-assistant), the capability-extras `pyproject.toml`, and `docs/solution.html` (the
-value-forward, six-page solution document).
+assistant, incl. Step 0), the two-README pair (`README.md` harness page + `README.automation.md`
+run-guide), the capability-extras `pyproject.toml`, and — under `docs/_harness/` — the
+value-forward `solution.html`, the `CAPABILITIES.md` catalogue ("what the harness
+produces"), and this design journal.
 
 ---
 
@@ -314,6 +353,12 @@ This is why the solution document frames the asset for "AI & Automation teams" b
 concept pitch, and keeps the build-team saving (~35%) distinct from the operator-side
 outcome (faster FTE realisation).
 
+It also frames each build's outputs as **products** — the application, the sign-off audit
+trail, the Excel deliverable, the operator guide, the workflow diagram, the tests — each
+tagged with the skill that generates it, so the skills read as *value-generators* rather
+than a feature list. And its first page speaks in an **executive register** (outcome +
+risk, no code identifiers); the developer detail lives on the pages that follow.
+
 ---
 
 ## 9. What is proven vs. deferred
@@ -328,7 +373,11 @@ outcome (faster FTE realisation).
   (README + operator Word + draw.io from one reconciled source).
 - Safe `.gitignore`, cross-platform secretstore, `uv.lock` committed for reproducible
   operator installs.
-- The solution document (`docs/solution.html`).
+- **Published as a GitHub template repo** (`314495_ai-ops-harness-swat`) with the
+  two-README model + Step 0 promotion; dev boilerplate and the `arena` mirror kept in sync.
+- The documentation set under `docs/_harness/`: the `solution.html` and `ai-ops-harness.html`
+  solution docs, the `CAPABILITIES.md` catalogue, and this design journal (Markdown +
+  a coupled HTML + a Confluence-style `.docx`).
 
 **Deferred (deliberately):**
 - **Worked-example automation + golden-file tie-out test** (P3) — a real `_report.py`
