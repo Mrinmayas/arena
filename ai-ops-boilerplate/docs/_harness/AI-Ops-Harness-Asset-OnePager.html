@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Ops Harness — Asset One-Pager</title>
+<style>
+  :root{
+    --acc:#a100ff; --acc-d:#6a1b9a; --acc-dd:#2e0a4f; --acc-050:#f6edff; --acc-100:#ecd9ff;
+    --ink:#1a1524; --ink2:#4a445a; --muted:#8b8598; --hair:#e7e2ef; --surface:#ffffff;
+    --good:#0a8f5b; --good-bg:#e6f7ef;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:#efecf4;color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;font-size:13px;
+    -webkit-font-smoothing:antialiased}
+  .sheet{max-width:940px;margin:22px auto;background:var(--surface);border:1px solid var(--hair);
+    border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(46,10,79,.12)}
+
+  /* hero */
+  .hero{background:linear-gradient(120deg,var(--acc-dd) 0%,var(--acc-d) 52%,var(--acc) 100%);
+    color:#fff;padding:26px 34px 22px;position:relative;overflow:hidden}
+  .hero::after{content:"›";position:absolute;right:14px;top:-38px;font-size:230px;line-height:1;
+    color:rgba(255,255,255,.09);font-weight:800}
+  .eyebrow-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#e6ccff}
+  .asset-tag{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.34);border-radius:999px;padding:4px 12px;color:#fff}
+  h1{margin:10px 0 6px;font-size:33px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  h1 .gt{color:#d7a8ff;font-weight:800}
+  .tag{max-width:74ch;font-size:14px;color:#efe2fc;margin:0}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+  .stat{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:9px;padding:10px 12px}
+  .stat .n{font-size:23px;font-weight:800;letter-spacing:-.01em;line-height:1}
+  .stat .n .u{font-size:13px;font-weight:700;color:#e6ccff}
+  .stat .l{font-size:10px;color:#e6ccff;margin-top:5px;line-height:1.3;text-transform:uppercase;letter-spacing:.04em}
+
+  /* body grid */
+  .body{display:grid;grid-template-columns:1.62fr 1fr;gap:0}
+  .col-l{padding:20px 22px 18px 34px;border-right:1px solid var(--hair)}
+  .col-r{padding:20px 34px 18px 22px;background:#faf8fe}
+  .lbl{font-size:10.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--acc);
+    display:flex;align-items:center;gap:7px;margin:0 0 8px}
+  .lbl .q{width:17px;height:17px;border-radius:5px;background:var(--acc);color:#fff;font-size:11px;font-weight:800;
+    display:inline-flex;align-items:center;justify-content:center}
+  .block{margin-bottom:16px}
+  .block:last-child{margin-bottom:0}
+  p.desc{margin:0 0 10px;color:var(--ink2);font-size:12.7px}
+  b{color:var(--ink)}
+
+  /* deliverables */
+  .dl-head{font-size:11px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.06em;margin:2px 0 8px}
+  .d1{background:var(--acc-050);border:1px solid var(--acc-100);border-radius:8px;padding:9px 12px;margin-bottom:9px}
+  .d1 .t{font-weight:800;font-size:12.5px;color:var(--acc-d)}
+  .d1 .d{font-size:11.7px;color:var(--ink2);margin-top:2px}
+  .skills{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .sk{font-size:11.6px;color:var(--ink2);padding-left:14px;position:relative;line-height:1.32}
+  .sk::before{content:"";position:absolute;left:0;top:6px;width:6px;height:6px;border-radius:2px;background:var(--acc)}
+  .sk b{color:var(--ink)}
+
+  /* benefit list */
+  ul.ben{margin:0;padding:0;list-style:none}
+  ul.ben li{position:relative;padding-left:18px;margin:0 0 8px;font-size:12.2px;color:var(--ink2);line-height:1.4}
+  ul.ben li::before{content:"›";position:absolute;left:0;top:-1px;color:var(--acc);font-weight:800;font-size:14px}
+  ul.ben li b{color:var(--ink)}
+
+  /* clients */
+  .proven{display:inline-flex;align-items:center;gap:8px;background:var(--good-bg);border:1px solid #bfe8d3;
+    border-radius:8px;padding:8px 12px;margin-bottom:9px}
+  .proven .dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+  .proven b{color:var(--good);font-size:12.5px}
+  .proven span{font-size:11.5px;color:var(--ink2)}
+  .ext-h{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 7px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11px;font-weight:700;color:var(--acc-d);background:#fff;border:1px solid var(--acc-100);
+    border-radius:999px;padding:4px 10px}
+
+  /* who */
+  .who{font-size:12.3px;color:var(--ink2);line-height:1.45}
+  .who b{color:var(--ink)}
+  .who .name{font-size:13.5px;font-weight:800;color:var(--acc-d)}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:11px 34px;border-top:1px solid var(--hair);background:#fff;font-size:10.3px;color:var(--muted)}
+  .foot b{color:var(--ink2)}
+  .foot .conf{font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--acc-d)}
+
+  @media (max-width:720px){ .body{grid-template-columns:1fr} .col-l{border-right:0;border-bottom:1px solid var(--hair)}
+    .stats{grid-template-columns:1fr 1fr} }
+  @media print{
+    body{background:#fff}
+    .sheet{margin:0;border:0;border-radius:0;box-shadow:none;max-width:none}
+    @page{size:A4;margin:9mm}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow-row">
+      <span class="eyebrow">Accenture · AI &amp; Data · South East Asia</span>
+      <span class="asset-tag">Asset · Reusable Accelerator</span>
+    </div>
+    <h1>AI Ops Harness <span class="gt">›</span></h1>
+    <p class="tag">A production-proven, copy-paste-ready accelerator that lets any team build and ship
+      operations &amp; back-office automations <b style="color:#fff">dramatically faster</b> — with audit,
+      compliance and operator enablement built in. Reverse-engineered from what already works.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">~20</div><div class="l">Use cases it distils — proven, not a concept</div></div>
+      <div class="stat"><div class="n">~35<span class="u">%</span></div><div class="l">Build effort saved per use case</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Deliverables — 1 framework + 6 AI skills</div></div>
+      <div class="stat"><div class="n">6<span class="u">+</span></div><div class="l">SEA clients adopting / in pipeline</div></div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT -->
+    <div class="col-l">
+      <div class="block">
+        <div class="lbl"><span class="q">›</span> What is this asset about?</div>
+        <p class="desc">The <b>AI Ops Harness</b> is a vetted starting point a team copies before building a new
+          operations automation. The framework carries the skeleton, audit trail, portal &amp; Excel machinery and
+          tests; six built-in <b>AI skills</b> guide the build in the team's house style. Each new tool ships in
+          <b>~35% less build effort</b>, runs deterministically on the operator's machine, and arrives with its
+          tests, audit sign-off and operator documentation already in place. Built <i>with</i> agentic AI — with
+          <b>no LLM at runtime</b>, so every run is reproducible and auditable.</p>
+
+        <div class="dl-head">One asset · seven deliverables</div>
+        <div class="d1">
+          <div class="t">1 · Copy-paste-ready code framework</div>
+          <div class="d">The project skeleton + vendored core (audit · Excel · portal login · orchestration · docs),
+            a Playwright recorder and a test harness — explicitly wired, laptop-runnable in one command.</div>
+        </div>
+        <div class="dl-head" style="margin-top:2px">2–7 · Six build-time AI skills</div>
+        <div class="skills">
+          <div class="sk"><b>Observability</b> — who did what: the four-eyes audit &amp; sign-off trail.</div>
+          <div class="sk"><b>Excel automation</b> — safe, corruption-free output, correct to the cent.</div>
+          <div class="sk"><b>Portal login</b> — resilient SSO / portal automation, Conditional-Access ready.</div>
+          <div class="sk"><b>Test generation</b> — golden-file tests that fail on a cent of drift.</div>
+          <div class="sk"><b>Doc generation</b> — README + an operator-friendly Word guide from one source.</div>
+          <div class="sk"><b>Workflow diagram</b> — a draw.io process diagram from that same source.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-r">
+      <div class="block">
+        <div class="lbl"><span class="q">›</span> What benefit it provides</div>
+        <ul class="ben">
+          <li><b>Faster delivery.</b> ~35% less build effort per use case for the SWAT build team — more automations shipped, sooner.</li>
+          <li><b>Faster FTE realisation.</b> The shipped tools run across a large operator network; the harness pulls that client outcome forward.</li>
+          <li><b>Compliance by default.</b> A who-did-what audit trail on every run — built for controls-sensitive finance work.</li>
+          <li><b>Consistent quality.</b> Tests, house-style and operator docs baked in — less rework, cleaner handover.</li>
+          <li><b>Reusable &amp; sellable.</b> One asset, many clients — a differentiated accelerator with no all-in-one equivalent found.</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <div class="lbl"><span class="q">›</span> Where it's proven — clients</div>
+        <div class="proven"><span class="dot"></span><b>Proven&nbsp;·&nbsp;WSA</b><span>(WS Audiology) — live</span></div>
+        <div class="ext-h">Extending to</div>
+        <div class="chips">
+          <span class="chip">WSA Phase 2 &amp; beyond</span>
+          <span class="chip">Grab</span>
+          <span class="chip">ASM</span>
+          <span class="chip">ISOS</span>
+          <span class="chip">L'Oréal</span>
+          <span class="chip">StarHub</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="lbl"><span class="q">›</span> Who built it</div>
+        <p class="who"><span class="name">Mrin Shrivastava</span><br>
+          <b>SWAT team · AI &amp; Data, South East Asia</b>, Accenture.<br>
+          Distilled from the SWAT team's delivered automations into a single reusable asset.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>AI Ops Harness</b> — Asset one-pager · Prepared for AI &amp; Data leadership, South East Asia</span>
+    <span class="conf">Accenture Internal</span>
+  </div>
+
+</div>
+</body>
+</html>
