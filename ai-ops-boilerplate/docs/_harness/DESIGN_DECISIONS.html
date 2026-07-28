@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Ops Automation Harness — Design Decisions &amp; Thought Process</title>
+<style>
+  :root{
+    --blue:#2a78d6; --blue-d:#184f95; --blue-150:#e8f1fd; --blue-100:#cde2fb;
+    --ink:#0b0b0b; --ink2:#3f4a5a; --muted:#6b7686; --navy:#172b4d;
+    --plane:#f7f8fa; --surface:#ffffff; --hair:#e6e8ec; --code-bg:#f4f5f7;
+    --good:#e3fcef; --good-ink:#006644; --warn:#fff0b3; --warn-ink:#974f0c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--plane);color:var(--navy);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.62;font-size:15px;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:248px 1fr;gap:34px;
+    padding:0 28px}
+  /* header band */
+  header.top{grid-column:1 / -1;background:linear-gradient(135deg,#0d366b,var(--blue-d));
+    color:#fff;margin:0 -28px 26px;padding:34px 40px 30px}
+  header.top .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:#9ec5f4;margin:0 0 8px}
+  header.top h1{margin:0 0 8px;font-size:30px;line-height:1.15;font-weight:750;letter-spacing:-.01em}
+  header.top .sub{color:#dbe8fb;font-size:14.5px;max-width:70ch}
+  header.top .sub em{color:#c6dbf7;font-style:italic}
+  header.top .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  header.top .chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    color:#eaf2fd;border-radius:999px;padding:3px 11px;font-size:11.5px;font-weight:600}
+  /* sidebar */
+  nav.toc{position:sticky;top:20px;align-self:start;font-size:13px;max-height:calc(100vh - 40px);
+    overflow:auto;border-right:1px solid var(--hair);padding:6px 14px 20px 0}
+  nav.toc .lbl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:4px 0 10px}
+  nav.toc a{display:block;color:var(--ink2);padding:5px 10px;border-radius:6px;border-left:2px solid transparent;
+    margin-bottom:2px;line-height:1.35}
+  nav.toc a:hover{background:var(--blue-150);text-decoration:none}
+  nav.toc a.active{background:var(--blue-150);border-left-color:var(--blue);color:var(--blue-d);font-weight:600}
+  /* content */
+  main{background:var(--surface);border:1px solid var(--hair);border-radius:12px;
+    padding:34px 40px 42px;margin-bottom:34px;min-width:0}
+  main h2{font-size:20px;font-weight:740;letter-spacing:-.01em;color:var(--navy);
+    margin:34px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--hair);scroll-margin-top:16px}
+  main h2:first-child{margin-top:4px}
+  main h3{font-size:15.5px;font-weight:700;color:var(--navy);margin:22px 0 6px;scroll-margin-top:16px}
+  p{margin:0 0 12px;color:var(--ink2)}
+  strong{color:var(--navy)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.7px;
+    background:var(--code-bg);border:1px solid var(--hair);border-radius:5px;padding:1px 6px;color:#403028}
+  ul{margin:0 0 14px;padding-left:22px} li{margin:5px 0;color:var(--ink2)}
+  table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13.5px}
+  th{text-align:left;background:var(--code-bg);color:var(--navy);font-weight:700;font-size:12px;
+    padding:9px 11px;border:1px solid var(--hair)}
+  td{padding:9px 11px;border:1px solid var(--hair);color:var(--ink2);vertical-align:top}
+  td strong{color:var(--navy)}
+  .call{border-left:4px solid var(--blue);background:var(--blue-150);border-radius:0 8px 8px 0;
+    padding:13px 18px;margin:16px 0;font-size:14px;color:var(--ink2)}
+  .call strong{color:var(--blue-d)}
+  .call.tip{border-left-color:var(--good-ink);background:var(--good)}
+  .call.tip strong{color:var(--good-ink)}
+  @media (max-width:860px){
+    .wrap{grid-template-columns:1fr}
+    nav.toc{position:static;border-right:0;border-bottom:1px solid var(--hair);max-height:none}
+    header.top{margin:0 -28px 20px}
+  }
+  @media print{
+    body{background:#fff} nav.toc{display:none}
+    .wrap{display:block;max-width:none;padding:0}
+    main{border:0;border-radius:0;padding:0} header.top{margin:0 0 18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Technical Design Record</p>
+    <h1>AI-Ops Automation Harness — Design Decisions &amp; Thought Process</h1>
+    <div class="sub"></div>
+    <div class="meta">
+      <span class="chip">branch feature/ai-ops-boilerplate</span>
+      <span class="chip">20/20 tests green</span>
+      <span class="chip">generated from DESIGN_DECISIONS.md</span>
+    </div>
+  </header>
+  <nav class="toc"><div class="lbl">On this page</div><a href="#1-the-idea-and-the-problem-it-solves">1. The idea and the problem it solves</a><a href="#2-constraints-the-sponsor-set">2. Constraints the sponsor set</a><a href="#3-how-the-reference-automations-were-studied">3. How the reference automations were studied</a><a href="#4-the-decisions-with-rationale">4. The decisions (with rationale)</a><a href="#5-decisions-we-reversed-and-why">5. Decisions we reversed — and why</a><a href="#6-what-got-built">6. What got built</a><a href="#7-the-documentation-subsystem-one-source-three-views">7. The documentation subsystem — one source, three views</a><a href="#8-positioning-where-the-value-actually-is">8. Positioning: where the value actually is</a><a href="#9-what-is-proven-vs-deferred">9. What is proven vs. deferred</a></nav>
+  <main>
+<p><em>A design journal: how this repo came to be, the constraints that shaped it, the decisions made (including the ones reversed), and why. Read <code>AUTHORING.md</code> for </em><em>how</em><em> to build an automation; read this for </em><em>why</em><em> the harness is shaped the way it is.</em></p>
+<h2 id="1-the-idea-and-the-problem-it-solves">1. The idea and the problem it solves</h2>
+<p>The team had delivered ~20 finance/back-office automations. Each new one still started from a blank folder — re-deciding the same layout, re-wiring the same audit trail, re-solving the same portal-login and Excel problems, re-writing the same kind of README. That setup work is repeated, undifferentiated effort.</p>
+<p><strong>The idea:</strong> a vetted, copy-me <strong>starting point</strong> — an <em>asset</em> — that any team standing up such an initiative can copy <em>before</em> they build. Not a framework to depend on; a skeleton to fork. It carries the directory structure, the audit logic, a Playwright recorder, tests, a skeletal <code>CLAUDE.md</code>, and the house-style skills already in place.</p>
+<p><strong>The value it targets:</strong> roughly <strong>35% of the build team&#x27;s effort per use case</strong>. A precise distinction that shaped the whole framing:</p>
+<ul><li><strong>~35% is the <em>build team&#x27;s</em> saving</strong> (the ~10-developer SWAT team). It is <strong>not</strong> an FTE or cost saving.</li><li><strong>FTE realisation is the <em>operator-side</em> outcome</strong> — the 300–500-person operator network runs the shipped tools; that is where headcount is realised. The harness accelerates <em>how fast</em> those tools ship, which pulls FTE realisation forward.</li></ul>
+<p>Keeping those two numbers from being conflated is why the solution document leads with &quot;faster FTE realisation&quot; as a qualitative outcome rather than a cost figure.</p>
+<div class="call tip"><strong>Not a prototype.</strong> The harness was <strong>reverse-engineered from what already works</strong> in ~20 delivered use cases. Its credibility is that it distils proven production tools, not that it proposes a clever new architecture.</div>
+<h2 id="2-constraints-the-sponsor-set">2. Constraints the sponsor set</h2>
+<p>These were given up front and are load-bearing — most of the design follows from them.</p>
+<table><thead><tr><th>Constraint</th><th>What it means</th><th>Consequence</th></tr></thead><tbody><tr><td><strong>Discovery is already complete</strong></td><td>The harness is <em>purely</em> the build-phase starter. No discovery tooling, no discovery skills, don&#x27;t design for that phase at all.</td><td>The automation is <strong>wired explicitly</strong>; there is no requirements/discovery layer.</td></tr><tr><td><strong>Don&#x27;t trust <code>common/</code></strong></td><td>The shared <code>common/</code> folder was built by another developer before there was a real project. Challenge every piece; keep only what the trusted automations actually use; full removal is acceptable.</td><td><code>common/</code> was <strong>not</strong> vendored wholesale — it was curated into a slimmer <code>core/</code>.</td></tr><tr><td><strong>Only explicitly-shared refs are &quot;trusted&quot;</strong></td><td>Imitate only the reference repos the sponsor named; ignore the rest of the monorepo&#x27;s demo/experimental projects.</td><td>The study (§3) was scoped to four repos, not the whole codebase.</td></tr><tr><td><strong>Tests always live in the automation&#x27;s own repo</strong></td><td>The main-branch pattern of central <code>common_automation/tests/&lt;name&gt;/</code> is explicitly rejected.</td><td>Every scaffold ships an in-repo <code>tests/</code>; everything is self-contained per repo.</td></tr><tr><td><strong>No GUI by default</strong></td><td>The majority of shipped tools are headless; a Tkinter GUI is per-project, not baseline.</td><td>The spine is a headless <code>run()</code> + CLI.</td></tr><tr><td><strong>&quot;Agentic&quot; means build-time only</strong></td><td>Shipped solutions are deterministic Python (Playwright + Excel). <strong>No runtime LLM / Anthropic API on the operator machine.</strong> &quot;Agentic&quot; = built <em>with</em> Claude Code.</td><td>No runtime-LLM layer, no API-key handling, no llm-integration skill.</td></tr><tr><td><strong>Observability is mandatory</strong></td><td>The human-vs-automation split is a compliance requirement (four-eyes sign-off), not a nice-to-have.</td><td>Audit is always-on and uniform; there is no un-audited path.</td></tr><tr><td><strong>Per-repo, self-contained, laptop-runnable</strong></td><td>Each deliverable is copied and shipped to operator machines via <code>uv run</code>, isolated per client.</td><td>Vendored core (not a shared package); safe <code>.gitignore</code> as a control.</td></tr></tbody></table>
+<h2 id="3-how-the-reference-automations-were-studied">3. How the reference automations were studied</h2>
+<p>Four trusted reference repos were read in depth (via parallel exploration agents) before any design was locked:</p>
+<ul><li><strong>wsa-reconsmart-connector</strong> — flat scripts, raw Playwright, no engine.</li><li><strong>ar_aging_compiler</strong> — self-contained pure-Python Excel, no browser.</li><li><strong>duplicate_payment_detector</strong> — standalone Playwright + pandas analysis, no engine.</li><li><strong>trade_payables_recon</strong> (incl. <code>ap_aging</code>) — full Stage/Step engine with resume + HITL.</li></ul>
+<p><strong>The finding that drove the architecture:</strong> these span a wide complexity range, and only <em>one</em> of the four uses the orchestration engine. A single rigid template can&#x27;t serve both a 200-line Excel compiler and a multi-stage portal workflow with review gates. So the harness had to be <strong>layered</strong> — a small always-present spine, with heavier capabilities opt-in.</p>
+<p>Other findings that became design inputs:</p>
+<ul><li>The <strong>recorder</strong> had zero coupling to <code>common/</code> → it lifts out cleanly as a standalone capability (only a Microsoft-specific API-path regex needed to become config-driven).</li><li><code>common/excel/</code> was pure-Python, zero COM → already cross-platform; <strong>keep</strong>.</li><li><code>common/secretstore/</code> was <strong>Windows-only</strong> (hard-coded Credential Manager) → this violated the cross-platform requirement and had to be fixed with a macOS Keychain backend.</li><li><code>common/portals/</code> was a decent generic base but imported <code>RunContext</code> from the engine → had to be <strong>decoupled</strong> so a simple automation can log in without pulling in the engine.</li><li>Two audit systems coexisted: the engine&#x27;s structured <code>runs/&lt;run_id&gt;/</code> store (only when the engine is used) and a per-automation <code>audit_logs/&lt;timestamp&gt;/</code> OTel-to-file trail (the <strong>common baseline</strong> all three non-engine refs used). The baseline became the mandatory floor; the runstore became an engine-only addition.</li><li>A second scan of <em>other</em> developers&#x27; projects confirmed two populations — engine- integrated tools vs. standalone GUI tools — and surfaced concrete anti-patterns to encode as guardrails (no hard-coded date constants, resolve ERP columns by header not index, never mutate input folders, no <code>from x import *</code>, rules workbook over Python constants, and so on).</li></ul>
+<h2 id="4-the-decisions-with-rationale">4. The decisions (with rationale)</h2>
+<p>Each of these is stated as <strong>context → decision → why → consequence</strong>.</p>
+<h3 id="41-packaging-per-repo-template-vendored-core">4.1 Packaging — per-repo template, vendored core</h3>
+<ul><li><strong>Context.</strong> Reusable machinery could be a shared installable package (one Enterprise account, technically feasible) or vendored into each repo.</li><li><strong>Decision.</strong> <strong>Per-repo template</strong>: the harness is a standalone repo copied to start each automation; the reusable <code>core/</code> is <strong>vendored in</strong>, not imported from a shared package.</li><li><strong>Why.</strong> Deliverables must be self-contained, client-isolated, and runnable on an operator laptop with nothing but <code>uv</code>. A shared package couples every deliverable&#x27;s lifecycle to a central release; vendoring keeps each repo independently shippable and auditable.</li><li><strong>Consequence.</strong> The known cost is <strong>drift</strong> — a core fix doesn&#x27;t automatically reach already-created repos. That is what <code>copier update</code> is meant to solve later (§5, §9); today a plain copy is accepted.</li></ul>
+<h3 id="42-one-spine-engine-opt-in">4.2 One spine, engine opt-in</h3>
+<ul><li><strong>Context.</strong> The complexity range (§3) tempted a two-scaffold design: a <code>simple</code> scaffold and an <code>orchestrated</code> scaffold, chosen at spin-up.</li><li><strong>Decision.</strong> <strong>One spine.</strong> A single structure defaults to a headless <code>run(inputs, outputs)</code> + <code>uv run</code> CLI; the Stage/Step <strong>engine</strong> (resume, HITL, the <code>runs/</code> store) is switched <strong>on only when needed</strong> — like a capability layer, not a separate scaffold.</li><li><strong>Why.</strong> Two scaffolds means two things to teach, test, and maintain, and a fork in the authoring path from day one. One spine that degrades gracefully to single-stage/no-HITL serves the simple case without a second framework.</li><li><strong>Consequence.</strong> The engine is genuinely optional; a simple compiler ships none of it. The orchestrated case wires <strong>one</strong> automation explicitly (a direct <code>build_automation()</code> call) — no <code>automations.yaml</code>, no registry <code>discover()</code> scan.</li></ul>
+<h3 id="43-observability-mandatory-and-uniform">4.3 Observability — mandatory and uniform</h3>
+<ul><li><strong>Context.</strong> For controls-sensitive finance work, &quot;who did what&quot; is the reviewer sign-off artefact (a four-eyes control), not just logging.</li><li><strong>Decision.</strong> Every run writes <code>audit_logs/&lt;timestamp&gt;/</code>:</li><li><code>audit.log</code> — human-readable, one line per event.</li><li><code>events.jsonl</code> — append-only; <strong>every event stamped <code>actor: automation | human</code></strong>, plus step/stage, action, status, timestamp, redactable detail.</li><li><code>run_summary.json</code> — the sign-off split: what the automation did vs. what a human did or approved. Human events are auto-recorded at boundaries (run trigger; HITL gates). API: <code>audit.automation(...)</code> by default, <code>audit.human(who, action)</code> for anything a person did. Implementation is <strong>stdlib logging + JSONL</strong> (always on, zero heavy deps); OTel is an optional extra to export spans off-box.</li><li><strong>Why.</strong> Attribution <em>is</em> the compliance value. Making it optional would create an un-audited path, which for finance is unacceptable.</li><li><strong>Consequence.</strong> Whether or not the engine is used, the <strong>same</strong> <code>audit_logs/</code> trail is produced — the engine bridges its events into the same stream via an <code>AuditSubscriber</code>. Only the OTel library is optional; the observability capability is not.</li></ul>
+<h3 id="44-excel-render-default-a-narrow-escape-hatch">4.4 Excel — <code>render()</code> default, a narrow escape hatch</h3>
+<ul><li><strong>Context.</strong> Raw <code>openpyxl</code> cell-poking had repeatedly caused corrupt files, data loss, and stale-formula bugs in production. But a genuine minority of tools legitimately need raw access (in-place operator-workbook edits, live COM recalc, <code>.xlsm</code> macros, surgical edits to huge templates).</li><li><strong>Decision.</strong> <code>core.excel.render()</code> (build a pandas model → render <strong>once</strong>, atomic save, preserve-by-default) is <strong>mandatory for all workbook generation</strong>. Raw openpyxl / xlwings-COM is allowed <strong>only</strong> for the explicitly-declared cases <code>render()</code> structurally can&#x27;t express — and money is <strong><code>Decimal</code> (<code>coerce.money</code>)</strong> even there. COM paths are flagged Windows-only.</li><li><strong>Why.</strong> This kills the corrupt-file / cent-drift bug class for the common case while still accommodating the real exceptions the codebase proves exist. It honours the existing <code>CLAUDE.md</code> mandate rather than inventing a looser policy.</li><li><strong>Consequence.</strong> Shared safety utilities — <code>find_header</code> (ERP-preamble-resilient header detection) and <code>repair_dropped_rels</code> (openpyxl external-link corruption on save) — were vendored into <code>core.excel.compat</code> because they were duplicated across production tools.</li></ul>
+<h3 id="45-no-discovery-explicit-wiring-legible-over-clever">4.5 No discovery, explicit wiring — legible over clever</h3>
+<ul><li><strong>Context.</strong> The source monorepo used an auto-discovery registry (<code>automations.yaml</code> + a <code>discover()</code> scan).</li><li><strong>Decision.</strong> Drop it. The automation is wired <strong>directly</strong> in <code>automation/automation.py</code>. A missing or misconfigured step fails loudly, never silently.</li><li><strong>Why.</strong> A copy-me starter must be something the next developer reads top-to-bottom, not reverse-engineers. Magic registries optimise for a large monorepo; a per-repo template optimises for legibility.</li><li><strong>Consequence.</strong> More explicitness in each repo, which is exactly the point.</li></ul>
+<h3 id="46-safe-gitignore-as-a-security-control">4.6 Safe <code>.gitignore</code> as a security control</h3>
+<ul><li><strong>Context.</strong> The source repo had a real leak: journal-entry run traces (<code>audit_logs/**/trace.jsonl</code>) were committed to a shared remote because <code>audit_logs/</code> was not ignored. A global auto-commit <code>git add .</code> hook on this machine compounds that risk on data repos.</li><li><strong>Decision.</strong> The shipped <code>.gitignore</code> ignores <code>inputs/</code>, <code>outputs/</code>, <code>audit_logs/</code>, <code>runs/</code>, recordings, and browser profiles <strong>by default</strong> — treated as a control, not a convenience. Client financial data must never be committed.</li><li><strong>Why.</strong> Deny-by-default is the only safe posture when an auto-commit hook can stage everything. Secrets come from the OS keychain (<code>core.secretstore</code>), never source.</li><li><strong>Consequence.</strong> A fresh clone won&#x27;t carry data dirs; <code>.gitkeep</code> placeholders keep the structure.</li></ul>
+<h3 id="47-cross-platform-by-construction">4.7 Cross-platform by construction</h3>
+<ul><li><strong>Decision.</strong> Pure-Python <code>openpyxl</code> / <code>render()</code> is the cross-platform default; <code>secretstore</code> got a macOS Keychain backend + a platform-aware factory (the Windows-only original was the single biggest portability bug). xlwings/COM recalc is Windows-only and flagged per-automation.</li><li><strong>Why.</strong> Developers work on Macs; operators may be on Windows. The default lane must work on both, with the platform-specific escape hatch clearly marked.</li></ul>
+<h2 id="5-decisions-we-reversed-and-why">5. Decisions we reversed — and why</h2>
+<p>Honest record of the thinking, because the reversals <em>are</em> the design process.</p>
+<ul><li><strong>Two scaffolds → one spine.</strong> Initially planned <code>simple</code> + <code>orchestrated</code> scaffolds. Reversed to a single spine with the engine opt-in, to avoid two divergent structures to maintain (§4.2).</li><li><strong>Vendored core was challenged.</strong> An independent critique argued for a versioned, installable <code>wsa-core</code> package pinned per repo instead of vendoring, plus <code>copier</code> for the shell. We kept <strong>vendoring</strong> (it fits the self-contained, client-isolated, laptop- runnable model) but adopted the critique&#x27;s real point: <code>copier update</code> is the eventual answer to vendored-core drift. Copier is <strong>deferred</strong>, not rejected.</li><li><strong>Excel dual-policy tightened.</strong> An early &quot;raw openpyxl for standalone tools&quot; idea was narrowed to &quot;<code>render()</code> mandatory + a narrow, explicitly-declared escape hatch&quot; (§4.4), matching the existing hard-won <code>CLAUDE.md</code> rule rather than loosening it.</li><li><strong>Data-exposure remediation deprioritised.</strong> The committed-traces leak (§4.6) is real, but the sponsor judged it intra-firm with no client harm and out of scope for this asset; history rewrite + force-push to a shared remote is destructive and team- coordinated. So the harness <em>prevents</em> the pattern going forward (safe <code>.gitignore</code>) without rewriting existing history.</li><li><strong>ROI framing corrected.</strong> Early illustrative day-counts (&quot;1 week → 3.5 days&quot;) were dropped in favour of <strong>~35% build effort saved per use case</strong>, with the build-vs-operator distinction made explicit (§1).</li></ul>
+<h2 id="6-what-got-built">6. What got built</h2>
+<p>On branch <code>feature/ai-ops-boilerplate</code> of the <code>314495_wsa-automation</code> repo (a git worktree; <code>main</code> untouched), mirrored to the personal <code>Mrinmayas/arena</code> repo. <strong>20/20 tests green.</strong></p>
+<p><strong>Vendored, generic <code>core/</code></strong> — brand-free, distilled from the trusted production tools:</p>
+<table><thead><tr><th>Module</th><th>Provides</th></tr></thead><tbody><tr><td><code>core.audit</code></td><td>Always-on observability; `actor: automation \</td><td>human` on every event; audit.log + events.jsonl + run_summary.json sign-off split; money redaction; stdlib-only, OTel opt-in.</td></tr><tr><td><code>core.excel</code></td><td>The <code>render()</code> framework (pandas model → one atomic write), <code>Decimal</code> money, formula seam, plus <code>compat.py</code> = <code>find_header</code> + <code>repair_dropped_rels</code>/<code>snapshot_rels</code>.</td></tr><tr><td><code>core.portals</code></td><td>Generic browser-login base, engine-decoupled: default-channel auto-launch, persistent Entra/Conditional-Access profile, tiered click-flow, teardown. SSO <em>and</em> username/password.</td></tr><tr><td><code>core.secretstore</code></td><td>Credential store with Windows (Credential Manager) <strong>and</strong> macOS (Keychain) backends + a platform-aware factory.</td></tr><tr><td><code>core.engine</code></td><td>Opt-in orchestration: Automation → Stage → Step, retries, resume, HITL, structured <code>runs/</code> store. Bridges events into <code>core.audit</code>.</td></tr><tr><td><code>core.docs</code></td><td>One reconciled <code>PROCESS_STEPS.md</code> → README + operator Word guide + draw.io diagram (see §7).</td></tr><tr><td><code>recorder/</code></td><td>Standalone, config-driven Playwright recorder (dev-time capture).</td></tr></tbody></table>
+<p><strong>Six build-time skills</strong> in <code>.claude/skills/</code> — the differentiated value (§8), each written against the shipped <code>core/</code> and symbol-checked so it teaches the real API: <code>observability</code>, <code>excel-automation</code>, <code>portal-login</code>, <code>test-generation</code>, <code>doc-generation</code>, <code>workflow-diagram-generation</code>.</p>
+<p>Plus <code>docs/AUTHORING.md</code> (the runbook), a skeletal <code>CLAUDE.md</code> (house rules for the AI assistant), the capability-extras <code>pyproject.toml</code>, and <code>docs/solution.html</code> (the value-forward, six-page solution document).</p>
+<h2 id="7-the-documentation-subsystem-one-source-three-views">7. The documentation subsystem — one source, three views</h2>
+<p>Operators live in Word; the build team and operator sign-off need a workflow diagram; the runbook is a README. Writing those three by hand guarantees they drift apart. So:</p>
+<p><strong>One reconciled <code>PROCESS_STEPS.md</code> is the single source of truth</strong>, and the README, the operator Word guide, and the draw.io diagram are all <em>rendered</em> from it.</p>
+<p>The non-negotiable first step is <strong>reconciliation</strong>: the process narrative (a transcript, a steps file, a Teams message, or a discovery Word doc) is diffed <strong>against the actual shipped code</strong>, a divergence report is produced, a human resolves it, and only then does anything render. On the Duplicate Payment Detector this surfaced six genuine narrative-vs- code divergences (e.g. the priority signal reads the code&#x27;s <code>Type</code> column, not the doc&#x27;s <code>Exc Type</code>; the release step the docstring called &quot;not built&quot; was in fact fully implemented). That reconciliation is what makes an operator sign-off trustworthy.</p>
+<p><strong>A design lesson worth recording — the diagram layout.</strong> The first draw.io renderer put every node on a single horizontal row. That was fine for a straight pipeline, but a decision that fans out to several mutually-exclusive outcomes drew its branch arrows sideways into adjacent boxes — overlapping arrows, labels landing on top of boxes. The fix was a small <strong>layered (rank-based) layout</strong>: rank each node by longest path from Start (so a decision&#x27;s alternatives share a <em>column</em>), then stack same-rank nodes on separate <em>rows</em> so decisions <strong>fan out vertically</strong> (up and down) while the spine stays straight left→right. The lesson: the bug wasn&#x27;t in one diagram, it was in the <em>rule</em> — fixing the rule fixes every diagram the skill will ever generate, and a no-overlap geometry test stops the regression coming back. This is the core argument for a deterministic renderer over hand-drawing.</p>
+<h2 id="8-positioning-where-the-value-actually-is">8. Positioning: where the value actually is</h2>
+<p>A prior-art scan found <strong>no all-in-one competitor</strong>: the fusion of a finance back-office RPA skeleton + bundled AI skill files, copied per-repo, appears novel. But the individual pieces — Playwright, openpyxl, RPA templates — are commodity.</p>
+<p><strong>So the durable advantage is not the plumbing. It is the conventions and finance-domain knowledge, captured as skills an AI assistant follows when generating each new automation.</strong> That is where maintenance investment should go — the skills and the vetted <code>core/</code> — not into bespoke infrastructure.</p>
+<p>This is why the solution document frames the asset for &quot;AI &amp; Automation teams&quot; broadly (whoever stands up such an initiative), leads with a <em>proven track record</em> rather than a concept pitch, and keeps the build-team saving (~35%) distinct from the operator-side outcome (faster FTE realisation).</p>
+<h2 id="9-what-is-proven-vs-deferred">9. What is proven vs. deferred</h2>
+<p><strong>Proven / done:</strong></p>
+<ul><li><code>core/{audit,excel,portals,secretstore,engine,docs}</code> + <code>recorder</code> — vendored, generic, committed, pushed. audit/excel/engine/docs are pytest-verified (<strong>20 tests</strong>); portals/secretstore are compile- and genericity-verified (live browser/keychain is a Mac/CI step).</li><li>Six skills + <code>AUTHORING.md</code>, all symbol-checked against <code>core/</code>.</li><li>The documentation subsystem, validated end-to-end on the Duplicate Payment Detector (README + operator Word + draw.io from one reconciled source).</li><li>Safe <code>.gitignore</code>, cross-platform secretstore, <code>uv.lock</code> committed for reproducible operator installs.</li><li>The solution document (<code>docs/solution.html</code>).</li></ul>
+<p><strong>Deferred (deliberately):</strong></p>
+<ul><li><strong>Worked-example automation + golden-file tie-out test</strong> (P3) — a real <code>_report.py</code> using <code>core.excel.render()</code> plus a correctness-to-the-cent regression test, proving <code>uv run automate</code> end-to-end on a laptop. This is the most valuable remaining work.</li><li><strong><code>copier</code> templatisation</strong> — adopt when several instances exist; its <code>copier update</code> propagates a core/skill fix into <em>already-created</em> repos, solving vendored-core drift at the scale where it starts to pay off. A plain copy is sufficient today.</li></ul>
+<p><strong>Known limitation carried forward:</strong> vendored core drifts until copier lands; the leaked historical traces in the source repo remain (prevention, not remediation, was the chosen scope).</p>
+<p><em>Prepared as a living design record for the AI-Ops Automation Harness. It reflects the state of the <code>feature/ai-ops-boilerplate</code> branch and the reasoning behind it — including the decisions that were reversed, because those are part of the thought process.</em> <em>— Mrin Shrivastava · SWAT team</em></p>
+  </main>
+</div>
+<script>
+  // active-section highlight in the sidebar
+  const links = [...document.querySelectorAll('nav.toc a')];
+  const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver((es) => {
+    es.forEach(e => { if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = map.get(e.target.id); if (a) a.classList.add('active');
+    } });
+  }, {rootMargin:'-10% 0px -80% 0px', threshold:0});
+  document.querySelectorAll('main h2[id]').forEach(h => obs.observe(h));
+</script>
+</body>
+</html>

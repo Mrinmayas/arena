@@ -24,6 +24,7 @@
 | `audit_logs/<ts>/events.jsonl` | Structured events, each stamped with `actor`. |
 
 ## 3. For developers
+- What the harness gives you (capability catalogue): `docs/_harness/CAPABILITIES.md`.
 - House rules: `CLAUDE.md`. Build skills: `.claude/skills/`.
 - `uv run pytest` runs the smoke + golden-file tie-out tests.
 - To record a portal flow during development: `uv run record <url>` (needs `--extra browser`).
