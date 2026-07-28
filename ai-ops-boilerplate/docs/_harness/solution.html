@@ -193,13 +193,16 @@
     <span class="vchip"><b>Market-ready</b> — from what works</span>
   </div>
 
-  <div class="vlabel">Operator enablement — documentation</div>
+  <div class="vlabel">What every build produces — value you can hand over</div>
   <div class="provenrail">
-    <span class="vchip"><b>README</b> run-guide</span>
+    <span class="vchip"><b>Working automation</b></span>
+    <span class="vchip"><b>Sign-off audit trail</b></span>
+    <span class="vchip"><b>Excel deliverable</b> · to the cent</span>
     <span class="vchip"><b>Operator Word</b> guide</span>
-    <span class="vchip"><b>Workflow diagram</b>  draw.io</span>
-    <span>· generated from one reconciled source — for discovery sign-off &amp; faster operator adoption</span>
+    <span class="vchip"><b>Workflow diagram</b> · draw.io</span>
+    <span class="vchip"><b>Regression tests</b></span>
   </div>
+  <p class="sub" style="margin-top:8px">Each build turns the harness's skills into concrete, hand-over-able deliverables — the tool, its audit sign-off, the operator's guide, the diagram, and the tests that protect it — not just working code.</p>
 
   <div class="vlabel">Proven on — and beyond</div>
   <div class="provenrail">
@@ -298,17 +301,18 @@
   <div class="sec-head"><span class="n">04</span><div><h2>Build-time AI skills</h2><div class="sub">Where the differentiated value lives — house-style captured as reusable instructions</div></div></div>
 
   <p>A prior-art scan confirmed the individual pieces (Playwright, openpyxl, RPA templates) are commodity;
-     the distinctive asset is <b>the team’s conventions + process &amp; domain knowledge, captured as skills an
-     AI assistant follows when generating each new automation</b>. Six ship in the harness:</p>
+     the distinctive asset is <b>the team’s conventions + process &amp; domain knowledge, captured as skills</b>.
+     And a skill isn’t just guidance — <b>each one is a product-generator</b>: it turns that knowledge into a
+     concrete deliverable in every build (the <i>Products</i> on page 1). Six ship in the harness:</p>
 
   <table>
-    <tr><th>Skill</th><th>Teaches</th></tr>
-    <tr><td><b>observability</b></td><td>Attribute every action automation vs human; the audit APIs, redaction, and the sign-off trail.</td></tr>
-    <tr><td><b>excel-automation</b></td><td>The <span class="kbd">render()</span> discipline, Decimal money, header detection, and the escape-hatch policy.</td></tr>
-    <tr><td><b>portal-login</b></td><td>SSO (persistent profile) and username/password login via the portal + secret-store APIs — never hardcode credentials.</td></tr>
-    <tr><td><b>test-generation</b></td><td>Pure-function, golden-file regression (exact output — e.g. tie-out to the cent), safety-property, and engine end-to-end tests.</td></tr>
-    <tr><td><b>doc-generation</b></td><td>Reconcile the process against the shipped code into one <span class="kbd">PROCESS_STEPS.md</span>, then render the README run-guide and the operator-friendly Word (.docx) guide from it.</td></tr>
-    <tr><td><b>workflow-diagram-generation</b></td><td>Render a draw.io workflow diagram from the same source — ranked left→right layout, decisions that fan out cleanly, actor colours &amp; HITL flags — for the build team and operator sign-off.</td></tr>
+    <tr><th>Skill</th><th>Teaches</th><th>Produces &rarr;</th></tr>
+    <tr><td><b>observability</b></td><td>Attribute every action automation vs human; the audit APIs, redaction, and the sign-off trail.</td><td>The <b>sign-off audit trail</b>.</td></tr>
+    <tr><td><b>excel-automation</b></td><td>The <span class="kbd">render()</span> discipline, Decimal money, header detection, and the escape-hatch policy.</td><td>The <b>Excel deliverable</b> — to the cent.</td></tr>
+    <tr><td><b>portal-login</b></td><td>SSO (persistent profile) and username/password login via the portal + secret-store APIs — never hardcode credentials.</td><td>Reliable <b>portal automation</b>.</td></tr>
+    <tr><td><b>test-generation</b></td><td>Pure-function, golden-file regression (exact output — e.g. tie-out to the cent), safety-property, and engine end-to-end tests.</td><td>The <b>regression test suite</b>.</td></tr>
+    <tr><td><b>doc-generation</b></td><td>Reconcile the process against the shipped code into one <span class="kbd">PROCESS_STEPS.md</span>, then render the README run-guide and the operator-friendly Word (.docx) guide from it.</td><td>The <b>process doc + operator Word guide</b>.</td></tr>
+    <tr><td><b>workflow-diagram-generation</b></td><td>Render a draw.io workflow diagram from the same source — ranked left→right layout, decisions that fan out cleanly, actor colours &amp; HITL flags — for the build team and operator sign-off.</td><td>The <b>draw.io workflow diagram</b>.</td></tr>
   </table>
   <p class="sub" style="margin-top:-4px">Each skill was written against the shipped <span class="kbd">core/</span> code and symbol-checked, so it teaches the real API — not a plausible-looking but wrong one.</p>
 
