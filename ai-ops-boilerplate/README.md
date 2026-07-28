@@ -1,36 +1,55 @@
-# AI-Ops Automation
+# AI-Ops Automation Harness
 
-<one-line: what this tool does>. Runs locally via `uv run`; produces `<output>` from files in `inputs/`.
+A vetted, **copy-me template** for building finance/back-office automations fast — the
+proven skeleton, audit trail, portal & Excel machinery, documentation/diagram generators,
+and house-style AI skills already in place. Reverse-engineered from ~20 delivered use cases.
 
-> Built from the **AI-Ops boilerplate**. Deterministic Python — no LLM at runtime.
+> Deterministic Python (Playwright + Excel), runs on an operator's machine via `uv`.
+> "Agentic" means built **with** Claude Code — there is **no LLM at runtime**.
 
-## 0. One-time setup (Windows / PowerShell)
-1. `winget install Python.Python.3.12`
-2. `winget install astral-sh.uv`
-3. Close and reopen the terminal.
-4. `uv sync`  — add capabilities as needed, e.g. `uv sync --extra browser --extra pdf`
+## What you get
 
-## 1. How to run
-1. Drop this period's files into `inputs/`.
-2. `uv run automate --inputs inputs --outputs outputs`
-3. Find the report in `outputs/`, and the audit trail in `audit_logs/<timestamp>/`.
+- **Boilerplate spine** — one explicit `run(inputs, outputs)` entry point + a `uv run automate` CLI (no auto-discovery magic).
+- **Audit logging** — always-on; every event attributed **automation vs human** (the four-eyes sign-off trail).
+- **Excel generation** — the `render()` framework, `Decimal` money, ERP-resilient header detection.
+- **Portal / Playwright automation** — persistent Entra / Conditional-Access profile, tiered click-retry, and a **session teardown** (clears the web session, keeps the device profile).
+- **Playwright recorder** — standalone, config-driven flow capture.
+- **Orchestration engine (opt-in)** — Stage/Step, retries, resume, human-in-the-loop, a `runs/` store.
+- **Docs from one source** — a README run-guide, an operator **Word** guide, and a **draw.io** workflow diagram, all rendered from one reconciled `PROCESS_STEPS.md`.
+- **Test-case generation** — golden-file tie-out (correctness to the cent), safety-property, engine e2e.
+- **Six build-time AI skills** in `.claude/skills/` — the house-style captured as reusable instructions.
 
-## 2. What it produces
-| Artifact | What it is |
-|---|---|
-| `outputs/<report>` | The deliverable. |
-| `audit_logs/<ts>/run_summary.json` | What the **automation** did vs what a **human** did/approved (sign-off trail). |
-| `audit_logs/<ts>/audit.log` | Human-readable, line-per-event. |
-| `audit_logs/<ts>/events.jsonl` | Structured events, each stamped with `actor`. |
+→ **Full catalogue** (with the run-time artefacts and the exact Playwright teardown behaviour): **[`docs/_harness/CAPABILITIES.md`](docs/_harness/CAPABILITIES.md)**
 
-## 3. For developers
-- What the harness gives you (capability catalogue): `docs/_harness/CAPABILITIES.md`.
-- House rules: `CLAUDE.md`. Build skills: `.claude/skills/`.
-- `uv run pytest` runs the smoke + golden-file tie-out tests.
-- To record a portal flow during development: `uv run record <url>` (needs `--extra browser`).
+## Use this template
 
-## Troubleshooting
-| Symptom | What to do |
-|---|---|
-| `uv: command not found` | Reopen the terminal after setup step 2, or re-run the winget install. |
-| No output produced | Check `audit_logs/<ts>/run_summary.json` — its `status` and last events show where it stopped. |
+1. Click **Use this template** on GitHub (or copy the repo).
+2. **Make it your automation's repo** — promote the run-guide to be the landing README:
+   ```
+   rm README.md && mv README.automation.md README.md
+   ```
+   then fill in its placeholders. (This harness page is meant to be replaced by *your automation's* run-guide.)
+3. `uv sync` — add capabilities as needed, e.g. `uv sync --extra browser --extra pdf`.
+4. Build — house rules in [`CLAUDE.md`](CLAUDE.md), the runbook in [`docs/AUTHORING.md`](docs/AUTHORING.md), and the skills in `.claude/skills/`.
+
+## Two READMEs, by design
+
+Two audiences read a README at two different moments, so the harness ships two:
+
+| File | Audience | When |
+|---|---|---|
+| **`README.md`** (this page) | A developer **evaluating/adopting** the harness | On GitHub, before "Use this template" |
+| **`README.automation.md`** | The **operator** + the dev of *your* automation | After you promote it to `README.md` (step 2) — clean, shippable, delivered to the operator |
+
+The run-guide is kept pristine on purpose: it's what you hand the operator. Promoting it
+(step 2) makes it the landing page of *your* automation, while this harness page stays
+available under `docs/_harness/`.
+
+## For adopters & reviewers
+
+- **What it produces** — [`docs/_harness/CAPABILITIES.md`](docs/_harness/CAPABILITIES.md)
+- **Why it's built this way** (design journal) — [`docs/_harness/DESIGN_DECISIONS.md`](docs/_harness/DESIGN_DECISIONS.md) (also `.html` / `.docx`)
+- **Solution & technical reference** — `docs/_harness/solution.html`, `docs/_harness/ai-ops-harness.html`
+
+---
+*AI-Ops Automation Harness · Mrin Shrivastava · SWAT team.*

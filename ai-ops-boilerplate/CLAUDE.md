@@ -3,6 +3,16 @@
 Guidance for Claude Code when building or modifying an automation in this repo.
 This repo was spun up from the **AI-Ops boilerplate** — keep its conventions.
 
+## Step 0 — promote the run-guide (do this first, once)
+The landing `README.md` is the **harness** page (for people evaluating the template). Your
+automation's operator/build run-guide is `README.automation.md`. The first build action is
+to make the run-guide the repo's README:
+```
+rm README.md && mv README.automation.md README.md
+```
+Then fill in its placeholders. The harness capability catalogue stays at
+`docs/_harness/CAPABILITIES.md`.
+
 ## What this is
 A single, self-contained finance/back-office automation that runs on an operator's
 machine via `uv run`. Deterministic Python (Playwright + Excel). **No LLM at runtime** —
